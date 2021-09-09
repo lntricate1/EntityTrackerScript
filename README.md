@@ -1,5 +1,6 @@
 # EntityTrackerScript
 Entity Tracker scarpet script, for visualizing accurate sub-tick entity movement and explosion behaviors.
+NOTE: You need to use this carpet fork for it to work. It is the latest 1.16.5 version with 2 extra injection into the setPos() method in Entity.class. If they accept my [pull request](https://github.com/gnembon/fabric-carpet/pull/1096), it will no longer be necessary.
 
 ![2021-09-07_03 51 06](https://user-images.githubusercontent.com/29168747/132648895-3aeceba9-18a9-4cd1-a0a0-ead5e020513a.png)
 
