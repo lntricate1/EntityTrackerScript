@@ -6,6 +6,11 @@ NOTE: You need to use this carpet fork for it to work. It is the latest 1.16.5 v
 
 ![2021-09-07_21 35 16](https://user-images.githubusercontent.com/29168747/132648957-d0e94cbf-4e7e-4df6-b4a2-662cba796fa3.png)
 
+## Instructions
+1. Stick the carpet fork in your mods, replacing carpet 1.16.5
+2. Stick the script in your .minecraft/config/carpet/scripts, or in the scripts folder of a particular save
+3. In the world, run /script load entitytracker
+
 ## Commands
 ### /entitytracker list
 Lists all active trackers, along with their indices in case you decide to remove them.
