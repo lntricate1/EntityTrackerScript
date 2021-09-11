@@ -60,7 +60,7 @@ __on_tick() ->
         if(entity != 'explosions', entity_event(entity, 'on_move', _(e, m, p1, p2, outer(data)) ->
         (
             for(keys(data),
-                player = _:0;
+                player = player(_:0);
                 radius = _:4;
                 if(dist(p1, player~'pos') < radius ||
                 dist(p2, player~'pos') < radius,
@@ -121,7 +121,7 @@ __on_explosion_outcome(pos, power, source, causer, mode, fire, blocks, entities)
     if(global_explosionParity == 1,
         for(pairs(collapseSettings()), if(_:0 == 'explosions',
             for(keys(_:1),
-                player = _:0;
+                player = player(_:0);
                 radius = _:4;
                 if(dist(pos, player~'pos') < radius ||
                 dist(pos, player~'pos') < radius,
@@ -218,7 +218,7 @@ clear(player, index) ->
         for(pairs(global_settings),
             [e, data] = _;
             for(keys(data),
-                if(_:0 != player, addSetting(e, _), amount += 1)
+                if(player(_:0) != player, addSetting(e, _), amount += 1)
             )
         );
         global_settings = settings;
@@ -319,7 +319,7 @@ points(sizex, sizey, eyes, duration, limit, radius, e) ->
     if(sizey != 'auto', sizey = number(sizey));
     if((sizex != 'auto' && type(sizex) != 'number') ||
     (sizey != 'auto' && type(sizey) != 'number'), print(player(), 'Invalid size!'); return());
-    addSetting(e, [player(), 'points', duration, limit, radius, [sizex, sizey, eyes]]);
+    addSetting(e, [player()~'name', 'points', duration, limit, radius, [sizex, sizey, eyes]]);
     print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA points ',
     '#F5ABB8 for ', '#5BCFFA ' + e, '#F5ABB8  in radius ', '#5BCFFA ' + radius,
     '#F5ABB8  with max count ', '#5BCFFA ' + limit,
@@ -328,7 +328,7 @@ points(sizex, sizey, eyes, duration, limit, radius, e) ->
 
 lines(type, duration, limit, radius, e) ->
 (
-    addSetting(e, [player(), type + '_lines', duration, limit, radius]);
+    addSetting(e, [player()~'name', type + '_lines', duration, limit, radius]);
     print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA ' + type,
     '#F5ABB8  for ', '#5BCFFA ' + e, '#F5ABB8  in radius ', '#5BCFFA ' + radius,
     '#F5ABB8  with max count ', '#5BCFFA ' + limit))
@@ -341,7 +341,7 @@ labels(type, precision, duration, limit, radius, e) ->
         if(type(precision) != 'number',
         print(player(), 'Invalid size!'); return())
     );
-    addSetting(e, [player(), type + '_label', duration, limit, radius, [precision]]);
+    addSetting(e, [player()~'name', type + '_label', duration, limit, radius, [precision]]);
     print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA ' + type,
     '#F5ABB8  for ', '#5BCFFA ' + e, '#F5ABB8  in radius ', '#5BCFFA ' + radius,
     '#F5ABB8  with max count ', '#5BCFFA ' + limit, '#F5ABB8  and precision ', '#5BCFFA ' + precision))
@@ -349,7 +349,7 @@ labels(type, precision, duration, limit, radius, e) ->
 
 explosions(type, duration, limit, radius, e) ->
 (
-    addSetting('explosions', [player(), type, duration, limit, radius, [e]]);
+    addSetting('explosions', [player()~'name', type, duration, limit, radius, [e]]);
     if(type == 'points',
         print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA explosions: ' + type,
         '#F5ABB8  in radius ', '#5BCFFA ' + radius,
@@ -482,7 +482,7 @@ getPlayerSettings(player) ->
     for(pairs(global_settings),
         [e, data] = _;
         for(keys(data),
-            if(_:0 == player, if(settings:e == null,
+            if(player(_:0) == player, if(settings:e == null,
                     settings = settings + {e -> {index -> _}},
                     settings:e = settings:e + {index -> _});
                 index += 1;
