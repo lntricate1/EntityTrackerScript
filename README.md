@@ -9,7 +9,8 @@ If you find bugs ping me in the [tnt archive](https://discord.gg/vPyUBcdmZV).
 
 ## Instructions
 1. Stick the carpet fork in your mods, replacing carpet 1.16.5
-2. Stick the script in your .minecraft/config/carpet/scripts, or in the scripts folder of a particular save
+2. Stick the script in your .minecraft/config/carpet/scripts, or in the scripts folder of a particular save.
+Optional: For servers where you have op but not file access, you can download or update the script by using '/carpet scriptsAppStore lntricate1/EntityTrackerScript/contents' (this might require a server restart to take effect), and then just '/script load entitytracker.sc' whenever you want to update.
 3. In the world, run /script load entitytracker
 
 ## Commands
