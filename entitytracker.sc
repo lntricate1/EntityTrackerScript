@@ -61,6 +61,7 @@ __on_tick() ->
         (
             for(keys(data),
                 player = player(_:0);
+                if(player == null, continue());
                 radius = _:4;
                 if(dist(p1, player~'pos') < radius ||
                 dist(p2, player~'pos') < radius,
@@ -122,6 +123,7 @@ __on_explosion_outcome(pos, power, source, causer, mode, fire, blocks, entities)
         for(pairs(collapseSettings()), if(_:0 == 'explosions',
             for(keys(_:1),
                 player = player(_:0);
+                if(player == null, continue());
                 radius = _:4;
                 if(dist(pos, player~'pos') < radius ||
                 dist(pos, player~'pos') < radius,
