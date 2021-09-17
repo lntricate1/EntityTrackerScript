@@ -55,9 +55,10 @@ global_explosionParity = 0;
 
 __on_tick() ->
 (
+    global_collapsedSettings = collapseSettings();
     global_usedEntitiesForTick = {};
     global_count = {};
-    for(pairs(collapseSettings()),
+    for(pairs(global_collapsedSettings),
         if(_:0 == 'explosions', continue());
         [entity, data] = _;
         entity_event(entity, 'on_move', _(e, m, p1, p2, outer(data)) ->
@@ -128,7 +129,7 @@ __on_tick() ->
 __on_explosion_outcome(pos, power, source, causer, mode, fire, blocks, entities) ->
 (
     if(global_explosionParity == 1,
-        for(collapseSettings():'explosions',
+        for(global_collapsedSettings:'explosions',
             playerString = _:0;
             player = player(playerString);
             if(player == null, continue());
