@@ -49,63 +49,72 @@ __config() ->
 };
 
 global_settings = {};
+global_count = {};
 global_loggedExplosions = {};
 global_explosionParity = 0;
 
 __on_tick() ->
 (
     global_usedEntitiesForTick = {};
+    global_count = {};
     for(pairs(collapseSettings()),
+        if(_:0 == 'explosions', continue());
         [entity, data] = _;
-        if(entity != 'explosions', entity_event(entity, 'on_move', _(e, m, p1, p2, outer(data)) ->
+        entity_event(entity, 'on_move', _(e, m, p1, p2, outer(data)) ->
         (
             for(keys(data),
-                player = player(_:0);
+                playerString = _:0;
+                player = player(playerString);
                 if(player == null, continue());
                 radius = _:4;
-                if(dist(p1, player~'pos') < radius ||
-                dist(p2, player~'pos') < radius,
-                    type = _:1;
-                    duration = _:2;
-                    limit = _:3;
-                    arguments = _:5;
-                    length = 0;
-                    for(values(global_usedEntitiesForTick:player), length += length(_));
-                    if(length <= limit,
-                        if(type == 'points',
-                            if(arguments:0 == 'auto', sizex = e~'width', sizex = arguments:0);
-                            if(arguments:1 == 'auto', sizey = e~'height', sizey = arguments:1);
-                            drawBox(player, 0xFFFFFFFF, duration, p1 + [0, sizey / 2, 0], sizex, sizey);
-                            if(arguments:2 == 'eyes', drawEyeHeight(player, 0x0000FFFF, duration, p1, sizex, e))
-                        );
-                        if(type == 'straight_lines', drawStraightLine(player, 0x0000FFFF, duration, p1, p2));
-                        if(type == 'accurate_lines', drawAxisLines(player, 0x0000FFFF, duration, m, p1, p2));
-                        if(type == 'motion_lines' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawMotion(player, 0xFF0000FF, duration, m, p1));
+                if(dist(p1, player~'pos') > radius && dist(p2, player~'pos') > radius, continue());
+                type = _:1;
+                limit = _:3;
+                if(global_count:playerString:type >= limit, continue());
+                duration = _:2;
+                arguments = _:5;
 
-                        if(type == 'position_label', drawLabel(player, 0x0000FFFF, 'top', duration,
-                        p1, if(arguments:0 != 'max', roundTriple(p1, arguments:0), p1)));
-
-                        if(type == 'motion_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0xFF0000FF, 'bottom', duration,
-                        p1 + [0, e~'height', 0], if(arguments:0 != 'max', roundTriple(m, arguments:0), m)));
-
-                        if(type == 'lifetime_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0x00FF00FF, 'center', duration,
-                        p1 + [0, e~'height' / 2, 0], e~'age'));
-
-                        if(type == 'fuse_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0x00FF00FF, 'center', duration,
-                        p1 + [0, e~'height' / 2, 0], query(e, 'nbt', 'Fuse')));
-
-                        if(global_usedEntitiesForTick == {},
-                            global_usedEntitiesForTick = {player -> {e~'uuid' -> {type -> 0}}}
-                        );
-                        if(global_usedEntitiesForTick:player:(e~'uuid') == null,
-                            global_usedEntitiesForTick:player = global_usedEntitiesForTick:player + {e~'uuid' -> {type -> 0}},
-                            global_usedEntitiesForTick:player:(e~'uuid') = global_usedEntitiesForTick:player:(e~'uuid') + {type -> 0}
-                        )
+                if(global_usedEntitiesForTick == {},
+                    global_usedEntitiesForTick = {player -> {e~'uuid' -> {type -> 0}}},
+                    if(global_usedEntitiesForTick:player:(e~'uuid') == null,
+                        global_usedEntitiesForTick:player = global_usedEntitiesForTick:player + {e~'uuid' -> {type -> 0}},
+                        global_usedEntitiesForTick:player:(e~'uuid') = global_usedEntitiesForTick:player:(e~'uuid') + {type -> 0}
                     )
-                )
+                );
+
+                if(global_count:playerString == null, global_count = global_count + {playerString -> {type -> 1}},
+                    if(global_count:playerString:type == null,
+                        global_count:playerString = global_count:playerString + {type -> 1},
+                        global_count:playerString:type += 1
+                    )
+                );
+                print(player, global_count);
+
+                if(type == 'points',
+                    if(arguments:0 == 'auto', sizex = e~'width', sizex = arguments:0);
+                    if(arguments:1 == 'auto', sizey = e~'height', sizey = arguments:1);
+                    drawBox(player, 0xFFFFFFFF, duration, p1 + [0, sizey / 2, 0], sizex, sizey);
+                    if(arguments:2 == 'eyes', drawEyeHeight(player, 0x0000FFFF, duration, p1, sizex, e));
+                    continue();
+                );
+                if(type == 'straight_lines', drawStraightLine(player, 0x0000FFFF, duration, p1, p2); continue());
+                if(type == 'accurate_lines', drawAxisLines(player, 0x0000FFFF, duration, m, p1, p2); continue());
+                if(type == 'motion_lines' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawMotion(player, 0xFF0000FF, duration, m, p1); continue());
+
+                if(type == 'position_label', drawLabel(player, 0x0000FFFF, 'top', duration,
+                p1, if(arguments:0 != 'max', roundTriple(p1, arguments:0), p1)); continue());
+
+                if(type == 'motion_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0xFF0000FF, 'bottom', duration,
+                p1 + [0, e~'height', 0], if(arguments:0 != 'max', roundTriple(m, arguments:0), m)); continue());
+
+                if(type == 'lifetime_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0x00FF00FF, 'center', duration,
+                p1 + [0, e~'height' / 2, 0], e~'age'); continue());
+
+                if(type == 'fuse_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0x00FF00FF, 'center', duration,
+                p1 + [0, e~'height' / 2, 0], query(e, 'nbt', 'Fuse')));
             )
-        )))
-    );
+        ))
+    )
     //for(pairs(global_loggedExplosions),
     //    [player, data] = _;
     //    print(player, format('b#5BCFFA @' + world_time()));
@@ -120,47 +129,54 @@ __on_tick() ->
 __on_explosion_outcome(pos, power, source, causer, mode, fire, blocks, entities) ->
 (
     if(global_explosionParity == 1,
-        for(pairs(collapseSettings()), if(_:0 == 'explosions',
-            for(keys(_:1),
-                player = player(_:0);
-                if(player == null, continue());
-                radius = _:4;
-                if(dist(pos, player~'pos') < radius ||
-                dist(pos, player~'pos') < radius,
-                    type = _:1;
-                    duration = _:2;
-                    limit = _:3;
-                    arguments = _:5;
+        for(collapseSettings():'explosions',
+            playerString = _:0;
+            player = player(playerString);
+            if(player == null, continue());
+            if(dist(pos, player~'pos') > _:4, continue());
+            type = _:1;
+            limit = _:3;
+            if(global_count:playerString:type >= limit, continue());
+            duration = _:2;
+            arguments = _:5;
 
-                    if(type == 'points', drawBox(player, 0xFF0000FF, duration, pos, 0.1, 0.1));
-                    selectedEntities = entity_selector(arguments:0);
-                    if(type == 'applied_velocity' || type == 'rays', for(entities,
-                        if(_ == player, continue());
-                        e = _;
-                        shouldRender = false;
-                        for(selectedEntities, if(_ == e, shouldRender = true; break()));
-                        if(shouldRender,
-                            if(type == 'applied_velocity', drawAppliedVelocity(player, duration, pos, e, power, 10));
-                            if(type == 'rays', drawRays(player, duration, pos, e))
-                        )
-                    ));
-
-                    //actualPos = split('d', query(source, 'nbt', 'Pos'));
-                    //actualPos = [split('\\[', actualPos:0):1, split(',', actualPos:1):1, split(',', actualPos:2):1];
-                    //actualPos = [split('\\[', actualPos:0):1, pos:1, split(',', actualPos:2):1];
-                    //if(global_loggedExplosions == {},
-                    //    global_loggedExplosions = {player -> {actualPos -> 0}}
-                    //);
-                    //if(global_loggedExplosions:player:actualPos == null,
-                    //    global_loggedExplosions:player = global_loggedExplosions:player + {actualPos -> 0},
-                    //    global_loggedExplosions:player:actualPos += 1
-                    //);
-                );
+            if(global_count:playerString == null, global_count = global_count + {playerString -> {type -> 1}},
+                if(global_count:playerString:type == null,
+                    global_count:playerString = global_count:playerString + {type -> 1},
+                    global_count:playerString:type += 1
+                )
             );
-        ));
+
+            if(type == 'points',
+                drawBox(player, 0xFF0000FF, duration, pos, 0.1, 0.1);
+                continue()
+            );
+            selectedEntities = entity_selector(arguments:0);
+            for(entities,
+                if(_ == player, continue());
+                e = _;
+                shouldRender = false;
+                for(selectedEntities, if(_ == e,
+                    if(type == 'applied_velocity', drawAppliedVelocity(player, duration, pos, e, power, 10); break());
+                    drawRays(player, duration, pos, e);
+                    break();
+                ))
+            );
+
+            //actualPos = split('d', query(source, 'nbt', 'Pos'));
+            //actualPos = [split('\\[', actualPos:0):1, split(',', actualPos:1):1, split(',', actualPos:2):1];
+            //actualPos = [split('\\[', actualPos:0):1, pos:1, split(',', actualPos:2):1];
+            //if(global_loggedExplosions == {},
+            //    global_loggedExplosions = {player -> {actualPos -> 0}}
+            //);
+            //if(global_loggedExplosions:player:actualPos == null,
+            //    global_loggedExplosions:player = global_loggedExplosions:player + {actualPos -> 0},
+            //    global_loggedExplosions:player:actualPos += 1
+            //);
+        );
         global_explosionParity = 0
     ,
-        global_explosionParity = 1;
+        global_explosionParity = 1
     )
 );
 
