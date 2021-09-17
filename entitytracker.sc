@@ -88,7 +88,6 @@ __on_tick() ->
                         global_count:playerString:type += 1
                     )
                 );
-                print(player, global_count);
 
                 if(type == 'points',
                     if(arguments:0 == 'auto', sizex = e~'width', sizex = arguments:0);
