@@ -347,7 +347,7 @@ points(sizex, sizey, eyes, duration, limit, radius, e) ->
 lines(type, duration, limit, radius, e) ->
 (
     addSetting(e, [player()~'name', type + '_lines', duration, limit, radius]);
-    print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA ' + type,
+    print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA ' + type + '_lines',
     '#F5ABB8  for ', '#5BCFFA ' + e, '#F5ABB8  in radius ', '#5BCFFA ' + radius,
     '#F5ABB8  with max count ', '#5BCFFA ' + limit))
 );
@@ -360,7 +360,7 @@ labels(type, precision, duration, limit, radius, e) ->
         print(player(), 'Invalid size!'); return())
     );
     addSetting(e, [player()~'name', type + '_label', duration, limit, radius, [precision]]);
-    print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA ' + type,
+    print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA ' + type + '_label',
     '#F5ABB8  for ', '#5BCFFA ' + e, '#F5ABB8  in radius ', '#5BCFFA ' + radius,
     '#F5ABB8  with max count ', '#5BCFFA ' + limit, '#F5ABB8  and precision ', '#5BCFFA ' + precision))
 );
