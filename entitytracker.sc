@@ -60,6 +60,7 @@ checkTickTime() ->
 (
     if(time() - global_time > 5000,
         print(player('all'), format('br Entity tracker: Max tick time reached. Resume with /script resume'));
+        for(entity_selector('@e'), entity_event(_, 'on_move', _(e,m,p1,p2) -> ''));
         run('script stop')
     )
 );
