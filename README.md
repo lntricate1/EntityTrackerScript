@@ -1,6 +1,6 @@
 # EntityTrackerScript
 Entity Tracker scarpet script, for visualizing accurate sub-tick entity movement and explosion behaviors.
-NOTE: You need to use this carpet fork for it to work. It is the latest 1.16.5 version with 2 extra injection into the setPos() method in Entity.class. If they accept my [pull request](https://github.com/gnembon/fabric-carpet/pull/1096), it will no longer be necessary.
+NOTE: You need to use this carpet extension for it to work. It has 2 extra injections into the setPos() method in Entity.class. If they accept my [pull request](https://github.com/gnembon/fabric-carpet/pull/1096), it will no longer be necessary for 1.17+, but it will still be necessary for 1.16.5- because it's not being worked on anymore.
 If you find bugs ping me in the [tnt archive](https://discord.gg/vPyUBcdmZV).
 
 ![2021-09-07_03 51 06](https://user-images.githubusercontent.com/29168747/132648895-3aeceba9-18a9-4cd1-a0a0-ead5e020513a.png)
@@ -8,7 +8,7 @@ If you find bugs ping me in the [tnt archive](https://discord.gg/vPyUBcdmZV).
 ![2021-09-07_21 35 16](https://user-images.githubusercontent.com/29168747/132648957-d0e94cbf-4e7e-4df6-b4a2-662cba796fa3.png)
 
 ## Instructions
-1. Stick the carpet fork in your mods, replacing carpet 1.16.5
+1. Stick the carpet fork in your mods. It depends on fabric-carpet 1.4.44.
 2. Stick the script in your .minecraft/config/carpet/scripts, or in the scripts folder of a particular save.
 Optional: For servers where you have op but not file access, you can download or update the script by using '/carpet scriptsAppStore lntricate1/EntityTrackerScript/contents' (this might require a server restart to take effect), and then just '/script load entitytracker.sc' whenever you want to update.
 3. In the world, run /script load entitytracker
