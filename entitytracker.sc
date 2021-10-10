@@ -23,6 +23,9 @@ __config() ->
         'explosions points <duration> <limit> <radius>' ->
             _(duration, limit, radius) -> explosions('points', duration, limit, radius, null),
 
+        'explosions blockRays <duration> <limit> <radius>' ->
+            _(duration, limit, radius) -> explosions('blockRays', duration, limit, radius, null),
+
         'explosions <explosion_type> <duration> <limit> <radius> <entities>' -> 'explosions',
 
         //'chat <log_type> <limit> <radius> <entities>' -> 'chat',
@@ -53,16 +56,28 @@ global_count = {};
 global_loggedExplosions = {};
 global_explosionParity = 0;
 
+checkTickTime() ->
+(
+    if(time() - global_time > 5000,
+        print(player('all'), format('br Entity tracker: Max tick time reached. Resume with /script resume'));
+        run('script stop')
+    )
+);
+
 __on_tick() ->
 (
     global_collapsedSettings = collapseSettings();
     global_usedEntitiesForTick = {};
     global_count = {};
+    global_time = time();
+    global_optimizedTnt = system_info('world_carpet_rules'):'optimizedTNT' == 'true';
     for(pairs(global_collapsedSettings),
+        checkTickTime();
         if(_:0 == 'explosions', continue());
         [entity, data] = _;
         entity_event(entity, 'on_move', _(e, m, p1, p2, outer(data)) ->
         (
+            checkTickTime();
             for(keys(data),
                 playerString = _:0;
                 player = player(playerString);
@@ -128,7 +143,8 @@ __on_tick() ->
 
 __on_explosion_outcome(pos, power, source, causer, mode, fire, blocks, entities) ->
 (
-    if(global_explosionParity == 1,
+    checkTickTime();
+    if(optimizedTnt && global_explosionParity == 1 || !optimizedTnt,
         for(global_collapsedSettings:'explosions',
             playerString = _:0;
             player = player(playerString);
@@ -151,6 +167,12 @@ __on_explosion_outcome(pos, power, source, causer, mode, fire, blocks, entities)
                 drawBox(player, 0xFF0000FF, duration, pos, 0.1, 0.1);
                 continue()
             );
+
+            if(type == 'blockRays',
+                drawBlockRays(player, duration, pos, power);
+                continue()
+            );
+
             selectedEntities = entity_selector(arguments:0);
             for(entities,
                 if(_ == player, continue());
@@ -174,10 +196,8 @@ __on_explosion_outcome(pos, power, source, causer, mode, fire, blocks, entities)
             //    global_loggedExplosions:player:actualPos += 1
             //);
         );
-        global_explosionParity = 0
-    ,
-        global_explosionParity = 1
-    )
+    );
+    global_explosionParity = 1 - global_explosionParity;
 );
 
 help(player) ->
@@ -368,7 +388,7 @@ labels(type, precision, duration, limit, radius, e) ->
 explosions(type, duration, limit, radius, e) ->
 (
     addSetting('explosions', [player()~'name', type, duration, limit, radius, [e]]);
-    if(type == 'points',
+    if(type == 'points' || type == 'blockRays',
         print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA explosions: ' + type,
         '#F5ABB8  in radius ', '#5BCFFA ' + radius,
         '#F5ABB8  with max count ', '#5BCFFA ' + limit)),
@@ -454,6 +474,31 @@ drawRays(player, duration, pos, entity) ->
                     ep:1 + y * w,
                     ep:2 - w / 2 + offset + z * w])
             )
+        )
+    )
+);
+
+drawBlockRays(player, duration, pos, power) ->
+(
+    c_for(x = 0, x <= 15, x += 1,
+        xRel = x / 15 * 2 - 1;
+        c_for(y = 0, y <= 15, y += 1,
+            yRel = y / 15 * 2 - 1;
+            l = sqrt(xRel * xRel + yRel * yRel + 1);
+            // print(player('all'), 'x: '+xRel+', y: '+yRel+', z: '+zRel);
+            px = xRel / l * power * 1.733333;
+            py = yRel / l * power * 1.733333;
+            pz = 1 / l * power * 1.733333;
+            drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [pz, px, py]);
+            drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [-pz, px, py]);
+            // drawStraightLine(player, 0x00FF00FF, duration, pos, pos + [px, pz, py]);
+            // drawStraightLine(player, 0x00FF00FF, duration, pos, pos + [px, -pz, py]);
+            // drawStraightLine(player, 0x0000FFFF, duration, pos, pos + [px, py, pz]);
+            // drawStraightLine(player, 0x0000FFFF, duration, pos, pos + [px, py, -pz])
+            drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [px, pz, py]);
+            drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [px, -pz, py]);
+            drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [px, py, pz]);
+            drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [px, py, -pz])
         )
     )
 );
