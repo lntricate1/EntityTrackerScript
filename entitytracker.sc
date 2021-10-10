@@ -471,7 +471,7 @@ drawRays(player, duration, pos, entity) ->
             c_for(z = 0, z <= 1, z += dx,
                 drawStraightLine(player, 0xFF0000FF, duration, pos, [
                     ep:0 - w / 2 + offset + x * w,
-                    ep:1 + y * w,
+                    ep:1 + y * h,
                     ep:2 - w / 2 + offset + z * w])
             )
         )
