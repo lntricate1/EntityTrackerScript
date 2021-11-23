@@ -56,13 +56,33 @@ global_count = {};
 global_loggedExplosions = {};
 global_explosionParity = 0;
 
+isTickFrozen() ->
+(
+    return(loop(2, run('tick freeze')):1:0~'frozen')
+);
+
 checkTickTime() ->
 (
     if(time() - global_time > 5000,
+        if(isTickFrozen,
+            global_time = time();
+            return()
+        );
         print(player('all'), format('br Entity tracker: Max tick time reached. Resume with /script resume'));
         for(entity_selector('@e'), entity_event(_, 'on_move', _(e,m,p1,p2) -> ''));
         run('script stop')
     )
+);
+
+updateUsedEntities(player, e, type) ->
+(
+    if(global_usedEntitiesForTick == {},
+        global_usedEntitiesForTick = {player -> {e~'uuid' -> {type -> 0}}},
+        if(global_usedEntitiesForTick:player:(e~'uuid') == null,
+            global_usedEntitiesForTick:player = global_usedEntitiesForTick:player + {e~'uuid' -> {type -> 0}},
+            global_usedEntitiesForTick:player:(e~'uuid') = global_usedEntitiesForTick:player:(e~'uuid') + {type -> 0}
+        )
+    );
 );
 
 __on_tick() ->
@@ -91,14 +111,6 @@ __on_tick() ->
                 duration = _:2;
                 arguments = _:5;
 
-                if(global_usedEntitiesForTick == {},
-                    global_usedEntitiesForTick = {player -> {e~'uuid' -> {type -> 0}}},
-                    if(global_usedEntitiesForTick:player:(e~'uuid') == null,
-                        global_usedEntitiesForTick:player = global_usedEntitiesForTick:player + {e~'uuid' -> {type -> 0}},
-                        global_usedEntitiesForTick:player:(e~'uuid') = global_usedEntitiesForTick:player:(e~'uuid') + {type -> 0}
-                    )
-                );
-
                 if(global_count:playerString == null, global_count = global_count + {playerString -> {type -> 1}},
                     if(global_count:playerString:type == null,
                         global_count:playerString = global_count:playerString + {type -> 1},
@@ -115,19 +127,19 @@ __on_tick() ->
                 );
                 if(type == 'straight_lines', drawStraightLine(player, 0x0000FFFF, duration, p1, p2); continue());
                 if(type == 'accurate_lines', drawAxisLines(player, 0x0000FFFF, duration, m, p1, p2); continue());
-                if(type == 'motion_lines' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawMotion(player, 0xFF0000FF, duration, m, p1); continue());
+                if(type == 'motion_lines' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawMotion(player, 0xFF0000FF, duration, m, p1); updateUsedEntities(player, e, type); continue());
 
                 if(type == 'position_label', drawLabel(player, 0x0000FFFF, 'top', duration,
                 p1, if(arguments:0 != 'max', roundTriple(p1, arguments:0), p1)); continue());
 
                 if(type == 'motion_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0xFF0000FF, 'bottom', duration,
-                p1 + [0, e~'height', 0], if(arguments:0 != 'max', roundTriple(m, arguments:0), m)); continue());
+                p1 + [0, e~'height', 0], if(arguments:0 != 'max', roundTriple(m, arguments:0), m)); updateUsedEntities(player, e, type); continue());
 
                 if(type == 'lifetime_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0x00FF00FF, 'center', duration,
-                p1 + [0, e~'height' / 2, 0], e~'age'); continue());
+                p1 + [0, e~'height' / 2, 0], e~'age'); updateUsedEntities(player, e, type); continue());
 
                 if(type == 'fuse_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0x00FF00FF, 'center', duration,
-                p1 + [0, e~'height' / 2, 0], query(e, 'nbt', 'Fuse')));
+                p1 + [0, e~'height' / 2, 0], query(e, 'nbt', 'Fuse')); updateUsedEntities(player, e, type););
             )
         ))
     )
