@@ -1,3 +1,11 @@
+global_singleEntities = ['area_effect_cloud', 'armor_stand', 'arrow', 'bat', 'bee', 'blaze', 'boat', 'cat', 'cave_spider', 'chest_minecart', 'chicken', 'cod', 'command_block_minecart', 'cow', 'creeper', 'dolphin', 'donkey', 'dragon_fireball', 'drowned', 'egg', 'elder_guardian', 'end_crystal', 'ender_dragon', 'ender_pearl', 'enderman', 'endermite', 'evoker', 'evoker_fangs', 'experience_bottle', 'experience_orb', 'eye_of_ender', 'falling_block', 'fireball', 'firework_rocket', 'fishing_bobber', 'fox', 'furnace_minecart', 'ghast', 'guardian', 'hoglin', 'hopper_minecart', 'horse', 'husk', 'illusioner', 'iron_golem', 'item', 'item_frame', 'leash_knot', 'lightning_bolt', 'llama', 'llama_spit', 'magma_cube', 'minecart', 'mooshroom', 'mule', 'ocelot', 'painting', 'panda', 'parrot', 'phantom', 'pig', 'piglin', 'piglin_brute', 'pillager', 'player', 'polar_bear', 'potion', 'pufferfish', 'rabbit', 'ravager', 'salmon', 'sheep', 'shulker', 'shulker_bullet', 'silverfish', 'skeleton', 'skeleton_horse', 'slime', 'small_fireball', 'snow_golem', 'snowball', 'spawner_minecart', 'spectral_arrow', 'spider', 'squid', 'stray', 'strider', 'tnt', 'tnt_minecart', 'trader_llama', 'trident', 'tropical_fish', 'turtle', 'vex', 'villager', 'vindicator', 'wandering_trader', 'witch', 'wither', 'wither_skeleton', 'wither_skull', 'wolf', 'zoglin', 'zombie', 'zombie_horse', 'zombie_villager', 'zombified_piglin'];
+e1 = ['#arrows', '#beehive_inhabitors', '#impact_projectiles', '#raiders', '#skeletons'];
+global_entities = [];
+for(e1, global_entities += '!' + _);
+for(global_singleEntities, global_entities += '!' + _);
+for(e1, global_entities += _);
+for(global_singleEntities, global_entities += _);
+
 __config() ->
 {
     'commands' ->
@@ -26,18 +34,13 @@ __config() ->
         'explosions blockRays <duration> <limit> <radius>' ->
             _(duration, limit, radius) -> explosions('blockRays', duration, limit, radius, null),
 
-        'explosions <explosion_type> <duration> <limit> <radius> <entities>' -> 'explosions',
-
-        //'chat <log_type> <limit> <radius> <entities>' -> 'chat',
-
-        //'chat explosions <limit> <radius>' -> _(limit, radius) -> chat('explosions', limit, radius, 'explosions')
+        'explosions <explosion_type> <duration> <limit> <radius> <entities>' -> 'explosions'
     },
     'arguments' ->
     {
         'index' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> []},
         'line_type' -> {'type' -> 'string', 'options' -> ['accurate', 'straight', 'motion']},
         'label_type' -> {'type' -> 'string', 'options' -> ['position', 'motion', 'lifetime']},
-        //'log_type' -> {'type' -> 'string', 'options' -> ['position', 'motion']},
         'explosion_type' -> {'type' -> 'string', 'options' -> ['rays', 'applied_velocity']},
         'duration' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> [100, 200, 500]},
         'limit' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> [100, 99999]},
@@ -45,7 +48,7 @@ __config() ->
         'sizeX' -> {'type' -> 'term', 'suggest' -> [0.98, 0.25, 0.1, 'auto']},
         'sizeY' -> {'type' -> 'term', 'suggest' -> [0.98, 0.25, 0.1, 'auto']},
         'eyes' -> {'type' -> 'term', 'options' -> ['eyes', 'no_eyes']},
-        'entities' -> {'type' -> 'text', 'suggest' -> ['@e[type=tnt]', '@e[type=snowball]', '@e[type=ender_pearl]', '@e[type=!player]', '@e[type=']},
+        'entities' -> {'type' -> 'text', 'options' -> global_singleEntities},
         'precision' -> {'type' -> 'term', 'min' -> 0, 'suggest' -> [3, 'max']},
     },
     'scope' -> 'global'
@@ -53,7 +56,6 @@ __config() ->
 
 global_settings = {};
 global_count = {};
-global_loggedExplosions = {};
 global_explosionParity = 0;
 
 isTickFrozen() ->
@@ -87,24 +89,20 @@ updateUsedEntities(player, e, type) ->
 
 __on_tick() ->
 (
-    global_collapsedSettings = collapseSettings();
     global_usedEntitiesForTick = {};
     global_count = {};
     global_time = time();
     global_optimizedTnt = system_info('world_carpet_rules'):'optimizedTNT' == 'true';
-    for(pairs(global_collapsedSettings),
-        checkTickTime();
+    for(pairs(global_settings),
         if(_:0 == 'explosions', continue());
-        [entity, data] = _;
-        entity_event(entity, 'on_move', _(e, m, p1, p2, outer(data)) ->
-        (
-            checkTickTime();
-            for(keys(data),
+        data = _:1;
+        for(entity_selector('@e[type=' + _:0 + ']'), entity_event(_, 'on_move', _(e, m, p1, p2, outer(data)) ->
+            for(data,
                 playerString = _:0;
                 player = player(playerString);
                 if(player == null, continue());
-                radius = _:4;
-                if(dist(p1, player~'pos') > radius && dist(p2, player~'pos') > radius, continue());
+                d = p1 - player~'pos';
+                if((d:0)^2 + (d:1)^2 + (d:2)^2 > (_:4)^2, continue());
                 type = _:1;
                 limit = _:3;
                 if(global_count:playerString:type >= limit, continue());
@@ -125,90 +123,72 @@ __on_tick() ->
                     if(arguments:2 == 'eyes', drawEyeHeight(player, 0x0000FFFF, duration, p1, sizex, e));
                     continue();
                 );
+
                 if(type == 'straight_lines', drawStraightLine(player, 0x0000FFFF, duration, p1, p2); continue());
+
                 if(type == 'accurate_lines', drawAxisLines(player, 0x0000FFFF, duration, m, p1, p2); continue());
+
                 if(type == 'motion_lines' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawMotion(player, 0xFF0000FF, duration, m, p1); updateUsedEntities(player, e, type); continue());
 
                 if(type == 'position_label', drawLabel(player, 0x0000FFFF, 'top', duration,
-                p1, if(arguments:0 != 'max', roundTriple(p1, arguments:0), p1)); continue());
+                    p1, if(arguments:0 != 'max', roundTriple(p1, arguments:0), p1)); continue());
 
                 if(type == 'motion_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0xFF0000FF, 'bottom', duration,
-                p1 + [0, e~'height', 0], if(arguments:0 != 'max', roundTriple(m, arguments:0), m)); updateUsedEntities(player, e, type); continue());
+                    p1 + [0, e~'height', 0], if(arguments:0 != 'max', roundTriple(m, arguments:0), m)); updateUsedEntities(player, e, type); continue());
 
                 if(type == 'lifetime_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0x00FF00FF, 'center', duration,
-                p1 + [0, e~'height' / 2, 0], e~'age'); updateUsedEntities(player, e, type); continue());
+                    p1 + [0, e~'height' / 2, 0], e~'age'); updateUsedEntities(player, e, type); continue());
 
                 if(type == 'fuse_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0x00FF00FF, 'center', duration,
-                p1 + [0, e~'height' / 2, 0], query(e, 'nbt', 'Fuse')); updateUsedEntities(player, e, type););
+                    p1 + [0, e~'height' / 2, 0], query(e, 'nbt', 'Fuse')); updateUsedEntities(player, e, type););
             )
         ))
     )
-    //for(pairs(global_loggedExplosions),
-    //    [player, data] = _;
-    //    print(player, format('b#5BCFFA @' + world_time()));
-    //    for(pairs(data),
-    //        [pos, count] = _;
-    //        print(player, format('#5BCFFA  ' + count + 'x ', '#F5ABB8  ' + pos))
-    //    )
-    //);
-    //global_loggedExplosions = {};
 );
 
 __on_explosion_outcome(pos, power, source, causer, mode, fire, blocks, entities) ->
 (
     checkTickTime();
-    if(optimizedTnt && global_explosionParity == 1 || !optimizedTnt,
-        for(global_collapsedSettings:'explosions',
-            playerString = _:0;
-            player = player(playerString);
-            if(player == null, continue());
-            if(dist(pos, player~'pos') > _:4, continue());
-            type = _:1;
-            limit = _:3;
-            if(global_count:playerString:type >= limit, continue());
-            duration = _:2;
-            arguments = _:5;
+    for(global_settings:'explosions',
+        playerString = _:0;
+        player = player(playerString);
+        if(player == null, continue());
+        d = pos - player~'pos';
+        if((d:0)^2 + (d:1)^2 + (d:2)^2 > (_:4)^2, continue());
+        type = _:1;
+        limit = _:3;
+        if(global_count:playerString:type >= limit, continue());
+        duration = _:2;
+        arguments = _:5;
 
-            if(global_count:playerString == null, global_count = global_count + {playerString -> {type -> 1}},
-                if(global_count:playerString:type == null,
-                    global_count:playerString = global_count:playerString + {type -> 1},
-                    global_count:playerString:type += 1
-                )
-            );
-
-            if(type == 'points',
-                drawBox(player, 0xFF0000FF, duration, pos, 0.1, 0.1);
-                continue()
-            );
-
-            if(type == 'blockRays',
-                drawBlockRays(player, duration, pos, power);
-                continue()
-            );
-
-            selectedEntities = entity_selector(arguments:0);
-            for(entities,
-                if(_ == player, continue());
-                e = _;
-                shouldRender = false;
-                for(selectedEntities, if(_ == e,
-                    if(type == 'applied_velocity', drawAppliedVelocity(player, duration, pos, e, power, 10); break());
-                    drawRays(player, duration, pos, e);
-                    break();
-                ))
-            );
-
-            //actualPos = split('d', query(source, 'nbt', 'Pos'));
-            //actualPos = [split('\\[', actualPos:0):1, split(',', actualPos:1):1, split(',', actualPos:2):1];
-            //actualPos = [split('\\[', actualPos:0):1, pos:1, split(',', actualPos:2):1];
-            //if(global_loggedExplosions == {},
-            //    global_loggedExplosions = {player -> {actualPos -> 0}}
-            //);
-            //if(global_loggedExplosions:player:actualPos == null,
-            //    global_loggedExplosions:player = global_loggedExplosions:player + {actualPos -> 0},
-            //    global_loggedExplosions:player:actualPos += 1
-            //);
+        if(global_count:playerString == null, global_count = global_count + {playerString -> {type -> 1}},
+            if(global_count:playerString:type == null,
+                global_count:playerString = global_count:playerString + {type -> 1},
+                global_count:playerString:type += 1
+            )
         );
+
+        if(type == 'points',
+            drawBox(player, 0xFF0000FF, duration, pos, 0.1, 0.1);
+            continue()
+        );
+
+        if(type == 'blockRays',
+            drawBlockRays(player, duration, pos, power);
+            continue()
+        );
+
+        selectedEntities = entity_selector('@e[type=' + arguments:0 + ']');
+        for(entities,
+            if(_ == player, continue());
+            e = _;
+            shouldRender = false;
+            for(selectedEntities, if(_ == e,
+                if(type == 'applied_velocity', drawAppliedVelocity(player, duration, pos, e, power, 10); break());
+                drawRays(player, duration, pos, e);
+                break()
+            ))
+        )
     );
     global_explosionParity = 1 - global_explosionParity;
 );
@@ -268,16 +248,21 @@ clear(player, index) ->
         settings = {};
         for(pairs(global_settings),
             [e, data] = _;
-            for(keys(data),
-                if(player(_:0) != player, addSetting(e, _), amount += 1)
-            )
+            for(data, if(player(_:0) == player, delete(global_settings:e, _); amount += 1))
         );
-        global_settings = settings;
-        print(player, format(
-        '#F5ABB8 Cleared ',
-        '#5BCFFA ' + amount,
-        '#F5ABB8  trackers for ',
-        '#5BCFFA ' + player))
+        if(amount == 1,
+            print(player, format(
+            '#F5ABB8 Cleared ',
+            '#5BCFFA 1',
+            '#F5ABB8  tracker for ',
+            '#5BCFFA ' + player))
+        ,
+            print(player, format(
+            '#F5ABB8 Cleared ',
+            '#5BCFFA ' + amount,
+            '#F5ABB8  trackers for ',
+            '#5BCFFA ' + player))
+        )
     )
 );
 
@@ -342,14 +327,13 @@ list(player) ->
                 
                 if(type == 'applied_velocity', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA applied velocity', 'w , duration: ',
                 '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius)));
-            );
+            )
         )
-    );
+    )
 );
 
 remove(player, index) ->
 (
-    player = player();
     playerSettings = getPlayerSettings(player);
     for(pairs(playerSettings),
         [e, data] = _;
@@ -412,11 +396,6 @@ explosions(type, duration, limit, radius, e) ->
         '#F5ABB8  for ', '#5BCFFA ' + e)),
     )
 );
-
-//chat(type, limit, radius, e) ->
-//(
-//    addSetting(e, [player(), type + '_log', null, limit, radius]);
-//);
 
 drawAxisLines(pl, col, duration, m, p1, p2) ->
 (
@@ -498,16 +477,11 @@ drawBlockRays(player, duration, pos, power) ->
         c_for(y = 0, y <= 15, y += 1,
             yRel = y / 15 * 2 - 1;
             l = sqrt(xRel * xRel + yRel * yRel + 1);
-            // print(player('all'), 'x: '+xRel+', y: '+yRel+', z: '+zRel);
             px = xRel / l * power * 1.733333;
             py = yRel / l * power * 1.733333;
             pz = 1 / l * power * 1.733333;
             drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [pz, px, py]);
             drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [-pz, px, py]);
-            // drawStraightLine(player, 0x00FF00FF, duration, pos, pos + [px, pz, py]);
-            // drawStraightLine(player, 0x00FF00FF, duration, pos, pos + [px, -pz, py]);
-            // drawStraightLine(player, 0x0000FFFF, duration, pos, pos + [px, py, pz]);
-            // drawStraightLine(player, 0x0000FFFF, duration, pos, pos + [px, py, -pz])
             drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [px, pz, py]);
             drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [px, -pz, py]);
             drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [px, py, pz]);
@@ -523,24 +497,6 @@ drawAppliedVelocity(player, duration, pos, entity, power, multiplier) ->
     dis = dist(pos, ep);
     dir = ep + [0, h, 0] - pos;
     drawStraightLine(player, 0XFF0000FF, duration, pos, pos + dir * (1 - dis / power / 2) * multiplier);
-);
-
-collapseSettings() ->
-(
-    expandedEntities = {};
-    for(pairs(global_settings),
-        [key, value] = _;
-        if(key != 'explosions', for(entity_selector(key),
-            if(expandedEntities:_ != null,
-                expandedEntities:_ = value + expandedEntities:_,
-                expandedEntities = expandedEntities + {_ -> value})
-        ),
-            if(expandedEntities:_ != null,
-                expandedEntities:_ = value + expandedEntities:_,
-                expandedEntities = expandedEntities + {key -> value})
-        )
-    );
-    return(expandedEntities)
 );
 
 addSetting(e, entry) ->
