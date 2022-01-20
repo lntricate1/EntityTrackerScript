@@ -49,7 +49,7 @@ __config() ->
         'sizeY' -> {'type' -> 'term', 'suggest' -> [0.98, 0.25, 0.1, 'auto']},
         'eyes' -> {'type' -> 'term', 'options' -> ['eyes', 'no_eyes']},
         'entities' -> {'type' -> 'text', 'options' -> global_singleEntities},
-        'precision' -> {'type' -> 'term', 'min' -> 0, 'suggest' -> [3, 'max']},
+        'precision' -> {'type' -> 'term', 'min' -> 0, 'suggest' -> [3, 'max']}
     },
     'scope' -> 'global'
 };
