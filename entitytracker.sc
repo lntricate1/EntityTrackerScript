@@ -56,6 +56,7 @@ __config() ->
 
 global_settings = {};
 global_count = {};
+global_projectiles = {};
 global_explosionParity = 0;
 
 isTickFrozen() ->
@@ -119,7 +120,7 @@ __on_tick() ->
                 if(type == 'points',
                     if(arguments:0 == 'auto', sizex = e~'width', sizex = arguments:0);
                     if(arguments:1 == 'auto', sizey = e~'height', sizey = arguments:1);
-                    drawBox(player, 0xFFFFFFFF, duration, p1 + [0, sizey / 2, 0], sizex, sizey);
+                    drawBox(player, 0xFFFFFFFF, duration, p2 + [0, sizey / 2, 0], sizex, sizey);
                     if(arguments:2 == 'eyes', drawEyeHeight(player, 0x0000FFFF, duration, p1, sizex, e));
                     continue();
                 );
@@ -303,11 +304,11 @@ list(player) ->
                 if(type == 'points', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA points', 'w , duration: ',
                 '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius
                 , 'w , size: ', '#5BCFFA ' + arguments:0, 'w * ', '#5BCFFA ' + arguments:1 + ' (' + arguments:2 + ')')));
-                
+
                 if(type == 'position_label', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA position label', 'w , duration: ',
                 '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius
                 , 'w , precision: ', '#5BCFFA ' + arguments:0)));
-                
+
                 if(type == 'motion_label', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA motion label', 'w , duration: ',
                 '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius
                 , 'w , precision: ', '#5BCFFA ' + arguments:0)));
@@ -315,7 +316,7 @@ list(player) ->
                 if(type == 'lifetime_label', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA lifetime label', 'w , duration: ',
                 '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radiuss
                 , 'w , precision: ', '#5BCFFA ' + arguments:0)))
-                
+
                 ,
 
 
@@ -324,7 +325,7 @@ list(player) ->
 
                 if(type == 'rays', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA rays', 'w , duration: ',
                 '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius)));
-                
+
                 if(type == 'applied_velocity', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA applied velocity', 'w , duration: ',
                 '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius)));
             )
@@ -399,7 +400,7 @@ explosions(type, duration, limit, radius, e) ->
 
 drawAxisLines(pl, col, duration, m, p1, p2) ->
 (
-    draw_shape('line', duration, 'color', col, 'from', p1, 'to', [p1:0, p2:1, p1:2]);
+    draw_shape('line', duration, 'color', col, 'player', pl, 'from', p1, 'to', [p1:0, p2:1, p1:2]);
     if(abs(m:0) >= abs(m:2),
         draw_shape('line', duration, 'color', col, 'player', pl, 'from', [p1:0, p2:1, p1:2], 'to', [p2:0, p2:1, p1:2]);
         draw_shape('line', duration, 'color', col, 'player', pl, 'from', [p2:0, p2:1, p1:2], 'to', [p2:0, p2:1, p2:2]),
