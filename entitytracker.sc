@@ -8,153 +8,210 @@ for(global_singleEntities, global_entities += _);
 
 __config() ->
 {
-    'commands' ->
-    {
-        '' -> _() -> print('Entity Tracker app by lntricate\; /entitytracker help for help'),
-        'help' -> _() -> help(player()),
-        'clear' -> _() -> clear(player(), 'all'),
-        'clear <index>' -> _(index) -> clear(player(), index),
-        'list' -> _() -> list(player()),
+  'commands' ->
+  {
+    '' -> _() -> print('Entity Tracker app by lntricate\; /entitytracker help for help'),
+    'help' -> _() -> help(player()),
+    'clear' -> _() -> clear(player(), 'all'),
+    'clear <index>' -> _(index) -> clear(player(), index),
+    'list' -> _() -> list(player()),
 
-        'points <sizeX> <sizeY> <eyes> <duration> <limit> <radius> <entities>' -> 'points',
+    'points <entities>' -> _(entities) -> points(entities, 100, 100, 100),
+    'points <entities> <duration>' -> _(entities, duration) -> points(entities, duration, 100, 100),
+    'points <entities> <duration> <limit>' -> _(entities, duration, limit) -> points(entities, duration, limit, 100),
+    'points <entities> <duration> <limit> <radius>' -> _(entities, duration, limit, radius) -> points(entities, duration, limit, radius),
 
-        'lines <line_type> <duration> <limit> <radius> <entities>' -> 'lines',
+    'boxes <entities>' -> _(entities) -> boxes(entities, 100, 100, 100, 'auto', 'auto', 'auto'),
+    'boxes <entities> <duration>' -> _(entities, duration) -> boxes(entities, duration, 100, 100, 'auto', 'auto', 'auto'),
+    'boxes <entities> <duration> <limit>' -> _(entities, duration, limit) -> boxes(entities, duration, limit, 100, 'auto', 'auto', 'auto'),
+    'boxes <entities> <duration> <limit> <radius>' -> _(entities, duration, limit, radius) -> boxes(entities, duration, limit, radius, 'auto', 'auto', 'auto'),
+    'boxes <entities> <duration> <limit> <radius> eyes' -> _(entities, duration, limit, radius) -> boxes(entities, duration, limit, radius, 'eyes', 'auto', 'auto'),
+    'boxes <entities> <duration> <limit> <radius> <sizeX> <sizeY>' -> _(entities, duration, limit, radius, sizeX, sizeY) -> boxes(entities, duration, limit, radius, 'custom', sizeX, sizeY),
 
-        'labels <label_type> <precision> <duration> <limit> <radius> <entities>' -> 'labels',
+    'ticks <entities>' -> _(entities) -> ticks(entities, 100, 100, 100, 'auto', 'auto', 'auto'),
+    'ticks <entities> <duration>' -> _(entities, duration) -> ticks(entities, duration, 100, 100, 'auto', 'auto', 'auto'),
+    'ticks <entities> <duration> <limit>' -> _(entities, duration, limit) -> ticks(entities, duration, limit, 100, 'auto', 'auto', 'auto'),
+    'ticks <entities> <duration> <limit> <radius>' -> _(entities, duration, limit, radius) -> ticks(entities, duration, limit, radius, 'auto', 'auto', 'auto'),
+    'ticks <entities> <duration> <limit> <radius> eyes' -> _(entities, duration, limit, radius) -> ticks(entities, duration, limit, radius, 'eyes', 'auto', 'auto'),
+    'ticks <entities> <duration> <limit> <radius> <sizeX> <sizeY>' -> _(entities, duration, limit, radius, sizeX, sizeY) -> ticks(entities, duration, limit, radius, 'custom', sizeX, sizeY),
 
-        'labels lifetime <duration> <limit> <radius> <entities>' -> 
-            _(duration, limit, radius, entities) -> labels('lifetime', null, duration, limit, radius, entities),
+    'deaths <entities>' -> _(entities) -> deaths(entities, 100, 100, 100, 'auto', 'auto', 'auto'),
+    'deaths <entities> <duration>' -> _(entities, duration) -> deaths(entities, duration, 100, 100, 'auto', 'auto', 'auto'),
+    'deaths <entities> <duration> <limit>' -> _(entities, duration, limit) -> deaths(entities, duration, limit, 100, 'auto', 'auto', 'auto'),
+    'deaths <entities> <duration> <limit> <radius>' -> _(entities, duration, limit, radius) -> deaths(entities, duration, limit, radius, 'auto', 'auto', 'auto'),
+    'deaths <entities> <duration> <limit> <radius> <sizeX> <sizeY>' -> _(entities, duration, limit, radius, sizeX, sizeY) -> deaths(entities, duration, limit, radius, 'custom', sizeX, sizeY),
 
-        'labels fuse <duration> <limit> <radius>' ->
-            _(duration, limit, radius) -> labels('fuse', null, duration, limit, radius, '@e[type=tnt]'),
+    'lines <entities>' -> _(entities) -> lines(entities, 'auto', 100, 100, 100),
+    'lines <entities> <duration>' -> _(entities, duration) -> lines(entities, 'auto', duration, 100, 100),
+    'lines <entities> <duration> <limit>' -> _(entities, duration, limit) -> lines(entities, 'auto', duration, limit, 100),
+    'lines <entities> <duration> <limit> <radius>' -> _(entities, duration, limit, radius) -> lines(entities, 'auto', duration, limit, radius),
 
-        'explosions points <duration> <limit> <radius>' ->
-            _(duration, limit, radius) -> explosions('points', duration, limit, radius, null),
+    'lines <entities> straight' -> _(entities) -> lines(entities, 'straight', 100, 100, 100),
+    'lines <entities> straight <duration>' -> _(entities, duration) -> lines(entities, 'straight', duration, 100, 100),
+    'lines <entities> straight <duration> <limit>' -> _(entities, duration, limit) -> lines(entities, 'straight', duration, limit, 100),
+    'lines <entities> straight <duration> <limit> <radius>' -> _(entities, duration, limit, radius) -> lines(entities, 'straight', duration, limit, radius),
 
-        'explosions blockRays <duration> <limit> <radius>' ->
-            _(duration, limit, radius) -> explosions('blockRays', duration, limit, radius, null),
+    'lines <entities> motion' -> _(entities) -> lines(entities, 'motion', 100, 100, 100),
+    'lines <entities> motion <duration>' -> _(entities, duration) -> lines(entities, 'motion', duration, 100, 100),
+    'lines <entities> motion <duration> <limit>' -> _(entities, duration, limit) -> lines(entities, 'motion', duration, limit, 100),
+    'lines <entities> motion <duration> <limit> <radius>' -> _(entities, duration, limit, radius) -> lines(entities, 'motion', duration, limit, radius),
 
-        'explosions <explosion_type> <duration> <limit> <radius> <entities>' -> 'explosions'
-    },
-    'arguments' ->
-    {
-        'index' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> []},
-        'line_type' -> {'type' -> 'string', 'options' -> ['accurate', 'straight', 'motion']},
-        'label_type' -> {'type' -> 'string', 'options' -> ['position', 'motion', 'lifetime']},
-        'explosion_type' -> {'type' -> 'string', 'options' -> ['rays', 'applied_velocity']},
-        'duration' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> [100, 200, 500]},
-        'limit' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> [100, 99999]},
-        'radius' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> [100]},
-        'sizeX' -> {'type' -> 'term', 'suggest' -> [0.98, 0.25, 0.1, 'auto']},
-        'sizeY' -> {'type' -> 'term', 'suggest' -> [0.98, 0.25, 0.1, 'auto']},
-        'eyes' -> {'type' -> 'term', 'options' -> ['eyes', 'no_eyes']},
-        'entities' -> {'type' -> 'text', 'options' -> global_singleEntities},
-        'precision' -> {'type' -> 'term', 'min' -> 0, 'suggest' -> [3, 'max']}
-    },
-    'scope' -> 'global'
+    'labels <label_type> <precision> <duration> <limit> <radius> <entities>' -> 'labels',
+
+    'labels lifetime <duration> <limit> <radius> <entities>' -> _(duration, limit, radius, entities) -> labels('lifetime', null, duration, limit, radius, entities),
+
+    'labels fuse <duration> <limit> <radius>' -> _(duration, limit, radius) -> labels('fuse', null, duration, limit, radius, 'tnt'),
+
+    'explosions' -> _() -> explosions('points', 100, 100, 100, 'auto', 'auto', ''),
+    'explosions <duration>' -> _(duration) -> explosions('points', duration, 100, 100, 'auto', 'auto'),
+    'explosions <duration> <limit>' -> _(duration, limit) -> explosions('points', duration, limit, 100, 'auto', 'auto', ''),
+    'explosions <duration> <limit> <radius>' -> _(duration, limit, radius) -> explosions('points', duration, limit, radius, 'auto', 'auto', ''),
+
+    'explosions <duration> <limit> <radius> <sizeX> <sizeY>' -> _(duration, limit, radius, sizeX, sizeY) -> explosions('boxes', duration, limit, radius, sizeX, sizeY, ''),
+
+    'explosions rays_entities' -> _() -> explosions('rays_entities', 100, 100, 100, 'auto', 'auto', '@e'),
+    'explosions rays_entities <duration>' -> _(duration) -> explosions('rays_entities', duration, 100, 100),
+    'explosions rays_entities <duration> <limit>' -> _(duration, limit) -> explosions('rays_entities', duration, limit, 100, 'auto', 'auto', '@e'),
+    'explosions rays_entities <duration> <limit> <radius>' -> _(duration, limit, radius) -> explosions('rays_entities', duration, limit, radius, 'auto', 'auto', '@e'),
+    'explosions rays_entities <duration> <limit> <radius> <entities>' -> _(duration, limit, radius, entities) -> explosions('rays_entities', duration, limit, radius, 'auto', 'auto', entities),
+
+    'explosions rays_blocks' -> _() -> explosions('rays_blocks', 100, 100, 100, 'auto', 'auto', ''),
+    'explosions rays_blocks <duration>' -> _(duration) -> explosions('rays_blocks', duration, 100, 100),
+    'explosions rays_blocks <duration> <limit>' -> _(duration, limit) -> explosions('rays_blocks', duration, limit, 100, 'auto', 'auto', ''),
+    'explosions rays_blocks <duration> <limit> <radius>' -> _(duration, limit, radius) -> explosions('rays_blocks', duration, limit, radius, 'auto', 'auto', ''),
+    'explosions rays_blocks <duration> <limit> <radius> <entities>' -> _(duration, limit, radius, entities) -> explosions('rays_blocks', duration, limit, radius, 'auto', 'auto', ''),
+
+    'explosions affected_entities' -> _() -> explosions('affected_entities', 100, 100, 100, 'auto', 'auto', '@e'),
+    'explosions affected_entities <duration>' -> _(duration) -> explosions('affected_entities', duration, 100, 100),
+    'explosions affected_entities <duration> <limit>' -> _(duration, limit) -> explosions('affected_entities', duration, limit, 100, 'auto', 'auto', '@e'),
+    'explosions affected_entities <duration> <limit> <radius>' -> _(duration, limit, radius) -> explosions('affected_entities', duration, limit, radius, 'auto', 'auto', '@e'),
+    'explosions affected_entities <duration> <limit> <radius> <entities>' -> _(duration, limit, radius, entities) -> explosions('affected_entities', duration, limit, radius, 'auto', 'auto', entities)
+  },
+  'arguments' ->
+  {
+    'index' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> []},
+    'label_type' -> {'type' -> 'string', 'options' -> ['position', 'motion', 'lifetime']},
+    'explosion_type' -> {'type' -> 'string', 'options' -> ['rays', 'applied_velocity']},
+    'duration' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> [100, 200, 500]},
+    'limit' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> [100, 99999]},
+    'radius' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> [100]},
+    'sizeX' -> {'type' -> 'float', 'suggest' -> [0.98, 0.25]},
+    'sizeY' -> {'type' -> 'float', 'suggest' -> [0.98, 0.25]},
+    'entities' -> {'type' -> 'string', 'options' -> global_singleEntities},
+    'precision' -> {'type' -> 'term', 'min' -> 0, 'suggest' -> [3, 'max']}
+  },
+  'scope' -> 'global'
 };
 
 global_settings = {};
 global_count = {};
-global_projectiles = {};
-global_explosionParity = 0;
 
 isTickFrozen() ->
 (
-    return(loop(2, run('tick freeze')):1:0~'frozen')
+  return(loop(2, run('tick freeze')):1:0~'frozen')
 );
 
 checkTickTime() ->
 (
-    if(time() - global_time > 5000,
-        if(isTickFrozen,
-            global_time = time();
-            return()
-        );
-        print(player('all'), format('br Entity tracker: Max tick time reached. Resume with /script resume'));
-        for(entity_selector('@e'), entity_event(_, 'on_move', _(e,m,p1,p2) -> ''));
-        run('script stop')
-    )
+  if(time() - global_time > 5000,
+    if(isTickFrozen,
+      global_time = time();
+      return()
+    );
+    print(player('all'), format('br Entity tracker: Max tick time reached. Resume with /script resume'));
+    for(entity_selector('@e'), entity_event(_, 'on_move', _(e,m,p1,p2) -> ''));
+    run('script stop')
+  )
 );
 
 updateUsedEntities(player, e, type) ->
 (
-    if(global_usedEntitiesForTick == {},
-        global_usedEntitiesForTick = {player -> {e~'uuid' -> {type -> 0}}},
-        if(global_usedEntitiesForTick:player:(e~'uuid') == null,
-            global_usedEntitiesForTick:player = global_usedEntitiesForTick:player + {e~'uuid' -> {type -> 0}},
-            global_usedEntitiesForTick:player:(e~'uuid') = global_usedEntitiesForTick:player:(e~'uuid') + {type -> 0}
-        )
-    );
+  if(global_usedEntitiesForTick == {},
+    global_usedEntitiesForTick = {player -> {e~'uuid' -> {type -> 0}}},
+    if(global_usedEntitiesForTick:player:(e~'uuid') == null,
+      global_usedEntitiesForTick:player = global_usedEntitiesForTick:player + {e~'uuid' -> {type -> 0}},
+      global_usedEntitiesForTick:player:(e~'uuid') = global_usedEntitiesForTick:player:(e~'uuid') + {type -> 0}
+    )
+  );
 );
 
 __on_tick() ->
 (
-    global_usedEntitiesForTick = {};
-    global_count = {};
-    global_time = time();
-    global_optimizedTnt = system_info('world_carpet_rules'):'optimizedTNT' == 'true';
-    for(pairs(global_settings),
-        if(_:0 == 'explosions', continue());
-        data = _:1;
-        for(entity_selector('@e[type=' + _:0 + ']'), entity_event(_, 'on_move', _(e, m, p1, p2, outer(data)) ->
-            for(data,
-                playerString = _:0;
-                player = player(playerString);
-                if(player == null, continue());
-                d = p1 - player~'pos';
-                if((d:0)^2 + (d:1)^2 + (d:2)^2 > (_:4)^2, continue());
-                type = _:1;
-                limit = _:3;
-                if(global_count:playerString:type >= limit, continue());
-                duration = _:2;
-                arguments = _:5;
-
-                if(global_count:playerString == null, global_count = global_count + {playerString -> {type -> 1}},
-                    if(global_count:playerString:type == null,
-                        global_count:playerString = global_count:playerString + {type -> 1},
-                        global_count:playerString:type += 1
-                    )
-                );
-
-                if(type == 'points',
-                    if(arguments:0 == 'auto', sizex = e~'width', sizex = arguments:0);
-                    if(arguments:1 == 'auto', sizey = e~'height', sizey = arguments:1);
-                    drawBox(player, 0xFFFFFFFF, duration, p2 + [0, sizey / 2, 0], sizex, sizey);
-                    if(arguments:2 == 'eyes', drawEyeHeight(player, 0x0000FFFF, duration, p1, sizex, e));
-                    continue();
-                );
-
-                if(type == 'straight_lines', drawStraightLine(player, 0x0000FFFF, duration, p1, p2); continue());
-
-                if(type == 'accurate_lines', drawAxisLines(player, 0x0000FFFF, duration, m, p1, p2); continue());
-
-                if(type == 'motion_lines' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawMotion(player, 0xFF0000FF, duration, m, p1); updateUsedEntities(player, e, type); continue());
-
-                if(type == 'position_label', drawLabel(player, 0x0000FFFF, 'top', duration,
-                    p1, if(arguments:0 != 'max', roundTriple(p1, arguments:0), p1)); continue());
-
-                if(type == 'motion_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0xFF0000FF, 'bottom', duration,
-                    p1 + [0, e~'height', 0], if(arguments:0 != 'max', roundTriple(m, arguments:0), m)); updateUsedEntities(player, e, type); continue());
-
-                if(type == 'lifetime_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0x00FF00FF, 'center', duration,
-                    p1 + [0, e~'height' / 2, 0], e~'age'); updateUsedEntities(player, e, type); continue());
-
-                if(type == 'fuse_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0x00FF00FF, 'center', duration,
-                    p1 + [0, e~'height' / 2, 0], query(e, 'nbt', 'Fuse')); updateUsedEntities(player, e, type););
-            )
-        ))
+  global_usedEntitiesForTick = {};
+  global_count = {};
+  global_time = time();
+  global_optimizedTnt = system_info('world_carpet_rules'):'optimizedTNT' == 'true';
+  for(pairs(global_settings),
+    if(_:0 == 'explosions', continue());
+    entity = _:0;
+    data = _:1;
+    for(entity_selector('@e[type=' + entity + ']'),
+      createOnRemovedEvents(_, data);
+      createOnTickEvents(_, data);
+      createOnMoveEvents(_, data);
     )
+  )
 );
 
 __on_explosion_outcome(pos, power, source, causer, mode, fire, blocks, entities) ->
 (
-    checkTickTime();
-    for(global_settings:'explosions',
-        playerString = _:0;
-        player = player(playerString);
+  checkTickTime();
+  for(global_settings:'explosions',
+    playerString = _:0;
+    player = player(playerString);
+    if(player == null, continue());
+    d = pos - player~'pos';
+    if((d:0)^2 + (d:1)^2 + (d:2)^2 > (_:4)^2, continue());
+    type = _:1;
+    limit = _:3;
+    if(global_count:playerString:type >= limit, continue());
+    duration = _:2;
+    arguments = _:5;
+
+    if(global_count:playerString == null, global_count = global_count + {playerString -> {type -> 1}},
+      if(global_count:playerString:type == null,
+        global_count:playerString = global_count:playerString + {type -> 1},
+        global_count:playerString:type += 1
+      )
+    );
+
+    if(type == 'points',
+      drawPoint(player, 0xFF0000FF, duration, pos);
+      continue()
+    );
+
+    if(type == 'boxes',
+      drawBox(player, 0xFF0000FF, 0xFF000044, duration, pos, arguments:0, arguments:1);
+      continue()
+    );
+
+    if(type == 'rays_blocks',
+      drawBlockRays(player, duration, pos, power);
+      continue()
+    );
+
+    for(entities,
+      if(arguments:2 == '@e' && _~'type' != 'player' || _~'type' == arguments:2,
+        if(type == 'affected_entities', drawAppliedVelocity(player, duration, pos, _, power, 10); break());
+        drawRays(player, duration, pos, _)
+      )
+    )
+  )
+);
+
+createLoadHandlers() ->
+(
+  for(pairs(global_settings),
+    if(_:0 == 'explosions', continue());
+    entity = _:0;
+    data = _:1;
+    entity_load_handler(entity, _(e, new, outer(data)) -> for(data,
+      if(_:1 == 'points' || _:1 == 'boxes' || _:1 == 'ticks' || _:1 == 'motion_lines',
+        p = e~'pos';
+        m = e~'motion';
+        player = player(_:0);
         if(player == null, continue());
-        d = pos - player~'pos';
+        d = p - player~'pos';
         if((d:0)^2 + (d:1)^2 + (d:2)^2 > (_:4)^2, continue());
         type = _:1;
         limit = _:3;
@@ -162,36 +219,119 @@ __on_explosion_outcome(pos, power, source, causer, mode, fire, blocks, entities)
         duration = _:2;
         arguments = _:5;
 
-        if(global_count:playerString == null, global_count = global_count + {playerString -> {type -> 1}},
-            if(global_count:playerString:type == null,
-                global_count:playerString = global_count:playerString + {type -> 1},
-                global_count:playerString:type += 1
-            )
-        );
+        if(type == 'motion_lines', drawMotion(player, 0xFF0000FF, duration, m, p); continue());
 
-        if(type == 'points',
-            drawBox(player, 0xFF0000FF, duration, pos, 0.1, 0.1);
-            continue()
-        );
+        if(type == 'points', drawPoint(player, 0xFFFFFFFF, duration, p); continue());
 
-        if(type == 'blockRays',
-            drawBlockRays(player, duration, pos, power);
-            continue()
-        );
-
-        selectedEntities = entity_selector('@e[type=' + arguments:0 + ']');
-        for(entities,
-            if(_ == player, continue());
-            e = _;
-            shouldRender = false;
-            for(selectedEntities, if(_ == e,
-                if(type == 'applied_velocity', drawAppliedVelocity(player, duration, pos, e, power, 10); break());
-                drawRays(player, duration, pos, e);
-                break()
-            ))
+        if(arguments:0 == 'custom', sizex = arguments:1; sizey = arguments:2, sizex = e~'width'; sizey = e~'height');
+        if(arguments:0 == 'eyes', drawEyeHeight(player, 0x0000FFFF, duration, p, sizex, e));
+        if(type == 'ticks',
+          drawBox(player, 0xFFFFFFFF, 0xFF00FF88, duration, p, sizex, sizey),
+          drawBox(player, 0xFFFFFFFF, 0x00000000, duration, p, sizex, sizey)
         )
+      ,
+        createOnRemovedEvents(e, data);
+        createOnMoveEvents(e, data)
+      )
+    ))
+  )
+);
+
+createOnRemovedEvents(e, data) ->
+(
+  entity_event(e, 'on_removed', _(e, outer(data)) -> for(data,
+    p = e~'pos';
+    m = e~'motion';
+    player = player(_:0);
+    if(player == null, continue());
+    d = p - player~'pos';
+    if((d:0)^2 + (d:1)^2 + (d:2)^2 > (_:4)^2, continue());
+    type = _:1;
+    limit = _:3;
+    if(global_count:playerString:type >= limit, continue());
+    duration = _:2;
+    arguments = _:5;
+
+    if(type == 'deaths',
+      if(arguments:0 == 'custom', sizex = arguments:1; sizey = arguments:2, sizex = e~'width'; sizey = e~'height');
+      drawBox(player, 0xFF0000FF, 0x00000000, duration, p, sizex, sizey);
+      drawMotion(player, 0xFF0000FF, duration, m, p)
+    )
+  ))
+);
+
+createOnTickEvents(e, data) ->
+(
+  entity_event(e, 'on_tick', _(e, outer(data)) -> for(data,
+    p = e~'pos';
+    m = e~'motion';
+    player = player(_:0);
+    if(player == null, continue());
+    d = p - player~'pos';
+    if((d:0)^2 + (d:1)^2 + (d:2)^2 > (_:4)^2, continue());
+    type = _:1;
+    limit = _:3;
+    if(global_count:playerString:type >= limit, continue());
+    duration = _:2;
+    arguments = _:5;
+
+    if(type == 'ticks',
+      if(arguments:0 == 'custom', sizex = arguments:1; sizey = arguments:2, sizex = e~'width'; sizey = e~'height');
+      if(arguments:0 == 'eyes', drawEyeHeight(player, 0x0000FFFF, duration, p, sizex, e));
+      drawBox(player, 0xFFFFFFFF, 0xFF00FF88, duration, p, sizex, sizey);
+      continue()
     );
-    global_explosionParity = 1 - global_explosionParity;
+
+    if(type == 'motion_lines' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawMotion(player, 0xFF0000FF, duration, m, p); updateUsedEntities(player, e, type); continue());
+
+    if(type == 'position_label', drawLabel(player, 0x0000FFFF, 'top', duration,
+        p, if(arguments:0 != 'max', roundTriple(p, arguments:0), p)); continue());
+
+    if(type == 'motion_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0xFF0000FF, 'bottom', duration,
+        p + [0, e~'height', 0], if(arguments:0 != 'max', roundTriple(m, arguments:0), m)); updateUsedEntities(player, e, type); continue());
+
+    if(type == 'lifetime_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0x00FF00FF, 'center', duration,
+        p + [0, e~'height' / 2, 0], e~'age'); updateUsedEntities(player, e, type); continue());
+
+    if(type == 'fuse_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0x00FF00FF, 'center', duration,
+        p + [0, e~'height' / 2, 0], query(e, 'nbt', 'Fuse')); updateUsedEntities(player, e, type))
+  ))
+);
+
+createOnMoveEvents(e, data) ->
+(
+  entity_event(e, 'on_move', _(e, m, p1, p2, outer(data)) -> for(data,
+    playerString = _:0;
+    player = player(playerString);
+    if(player == null, continue());
+    d = p1 - player~'pos';
+    if((d:0)^2 + (d:1)^2 + (d:2)^2 > (_:4)^2, continue());
+    type = _:1;
+    limit = _:3;
+    if(global_count:playerString:type >= limit, continue());
+    duration = _:2;
+    arguments = _:5;
+
+    if(global_count:playerString == null, global_count = global_count + {playerString -> {type -> 1}},
+      if(global_count:playerString:type == null,
+        global_count:playerString = global_count:playerString + {type -> 1},
+        global_count:playerString:type += 1
+      )
+    );
+
+    if(type == 'points', drawPoint(player, 0xFFFFFFFF, duration, p2); continue());
+
+    if(type == 'boxes',
+      if(arguments:0 == 'custom', sizex = arguments:1; sizey = arguments:2, sizex = e~'width'; sizey = e~'height');
+      if(arguments:0 == 'eyes', drawEyeHeight(player, 0x0000FFFF, duration, p, sizex, e));
+      drawBox(player, 0xFFFFFFFF, 0x00000000, duration, p2, sizex, sizey);
+      continue()
+    );
+
+    if(type == 'straight_lines', drawStraightLine(player, 0x0000FFFF, duration, p1, p2); continue());
+
+    if(type == 'axis_lines', drawAxisLines(player, 0x0000FFFF, duration, m, p1, p2); continue())
+  ))
 );
 
 help(player) ->
@@ -239,301 +379,332 @@ help(player) ->
 
 clear(player, index) ->
 (
-    if(index != 'all', remove(player, index),
-        print(player, '');
-        if(getPlayerSettings(player) == {},
-            print(player, format('#F5ABB8 No trackers configured'));
-            return()
-        );
-        amount = 0;
-        settings = {};
-        for(pairs(global_settings),
-            [e, data] = _;
-            for(data, if(player(_:0) == player, delete(global_settings:e, _); amount += 1))
-        );
-        if(amount == 1,
-            print(player, format(
-            '#F5ABB8 Cleared ',
-            '#5BCFFA 1',
-            '#F5ABB8  tracker for ',
-            '#5BCFFA ' + player))
-        ,
-            print(player, format(
-            '#F5ABB8 Cleared ',
-            '#5BCFFA ' + amount,
-            '#F5ABB8  trackers for ',
-            '#5BCFFA ' + player))
-        )
+  if(index != 'all', remove(player, index),
+    print(player, '');
+    if(getPlayerSettings(player) == {},
+      print(player, format('#F5ABB8 No trackers configured'));
+      return()
+    );
+    amount = 0;
+    settings = {};
+    for(pairs(global_settings),
+      [e, data] = _;
+      for(data, if(player(_:0) == player, delete(global_settings:e, _); amount += 1))
+    );
+    if(amount == 1,
+      print(player, format(
+      '#F5ABB8 Cleared ',
+      '#5BCFFA 1',
+      '#F5ABB8  tracker for ',
+      '#5BCFFA ' + player))
+    ,
+      print(player, format(
+      '#F5ABB8 Cleared ',
+      '#5BCFFA ' + amount,
+      '#F5ABB8  trackers for ',
+      '#5BCFFA ' + player))
     )
+  )
 );
 
 list(player) ->
 (
-    settings = getPlayerSettings(player);
-    if(settings == {},
-        print(player, '');
-        print(player, format('#F5ABB8 No trackers configured'));
-        return()
-    );
+  settings = getPlayerSettings(player);
+  if(settings == {},
     print(player, '');
-    print(player, format('#F5ABB8 List of trackers for ',
-    '#5BCFFA ' + player,
-    '#F5ABB8  (remove any entry using ',
-    '#5BCFFA /entitytracker clear <index>', '#F5ABB8 )'));
-    for(pairs(settings),
-        [e, data] = _;
-        print(player, '');
-        print(player, format('#F5ABB8 ' + e + ':'));
-        for(pairs(data),
-            [index, args] = _;
-            type = args:1;
-            duration = args:2;
-            limit = args:3;
-            radius = args:4;
-            arguments = args:5;
-            if(e != 'explosions',
-                if(type == 'accurate_lines', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA accurate lines', 'w , duration: ',
-                '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius)));
+    print(player, format('#F5ABB8 No trackers configured'));
+    return()
+  );
+  print(player, '');
+  print(player, format('#F5ABB8 List of trackers for ',
+  '#5BCFFA ' + player,
+  '#F5ABB8  (remove any entry using ',
+  '#5BCFFA /entitytracker clear <index>', '#F5ABB8 )'));
+  for(pairs(settings),
+    [e, data] = _;
+    print(player, '');
+    print(player, format('#F5ABB8 ' + e + ':'));
+    for(pairs(data),
+      [index, args] = _;
+      type = args:1;
+      duration = args:2;
+      limit = args:3;
+      radius = args:4;
+      arguments = args:5;
+      if(e != 'explosions',
+        if(type == 'points' || type == 'axis_lines' || type == 'straight_lines' || type == 'motion_lines',
+          print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA ' + type, 'w , duration: ', '#5BCFFA ' + duration,
+          'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius)));
 
-                if(type == 'straight_lines', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA straight lines', 'w , duration: ',
-                '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius)));
+        if(type == 'boxes' || type == 'ticks' || type == 'deaths', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA ' + type, 'w , duration: ',
+        '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius
+        , 'w , size: ', '#5BCFFA ' + arguments:1, 'w *', '#5BCFFA ' + arguments:2)));
 
-                if(type == 'motion_lines', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA motion lines', 'w , duration: ',
-                '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius)));
+        if(type == 'position_label', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA position label', 'w , duration: ',
+        '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius
+        , 'w , precision: ', '#5BCFFA ' + arguments:0)));
 
-                if(type == 'points', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA points', 'w , duration: ',
-                '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius
-                , 'w , size: ', '#5BCFFA ' + arguments:0, 'w * ', '#5BCFFA ' + arguments:1 + ' (' + arguments:2 + ')')));
+        if(type == 'motion_label', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA motion label', 'w , duration: ',
+        '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius
+        , 'w , precision: ', '#5BCFFA ' + arguments:0)));
 
-                if(type == 'position_label', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA position label', 'w , duration: ',
-                '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius
-                , 'w , precision: ', '#5BCFFA ' + arguments:0)));
+        if(type == 'lifetime_label', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA lifetime label', 'w , duration: ',
+        '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radiuss
+        , 'w , precision: ', '#5BCFFA ' + arguments:0)))
 
-                if(type == 'motion_label', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA motion label', 'w , duration: ',
-                '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius
-                , 'w , precision: ', '#5BCFFA ' + arguments:0)));
+        ,
 
-                if(type == 'lifetime_label', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA lifetime label', 'w , duration: ',
-                '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radiuss
-                , 'w , precision: ', '#5BCFFA ' + arguments:0)))
+        if(type == 'points' || type == 'rays_blocks', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA ' + type, 'w , duration: ',
+        '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius)));
 
-                ,
+        if(type == 'boxes', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA ' + type, 'w , duration: ',
+        '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius
+        , 'w , size: ', '#5BCFFA ' + arguments:1, 'w *', '#5BCFFA ' + arguments:2)));
 
-
-                if(type == 'points', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA points', 'w , duration: ',
-                '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius)));
-
-                if(type == 'rays', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA rays', 'w , duration: ',
-                '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius)));
-
-                if(type == 'applied_velocity', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA applied velocity', 'w , duration: ',
-                '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius)));
-            )
-        )
+        if(type == 'rays_entities' || type == 'affected_entities', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA ' + type, 'w , duration: ',
+        '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius)))
+      )
     )
+  )
 );
 
 remove(player, index) ->
 (
-    playerSettings = getPlayerSettings(player);
-    for(pairs(playerSettings),
-        [e, data] = _;
-        if(data:index != null,
-            delete(global_settings:e, data:index);
-            print(player, format(
-                '#F5ABB8 Removed ' + index + ': ',
-                '#5BCFFA ' + data:index:1));
-            return()
-        )
-    );
-    print(player, format('#F5ABB8 Index not found'));
+  playerSettings = getPlayerSettings(player);
+  for(pairs(playerSettings),
+    [e, data] = _;
+    if(data:index != null,
+      delete(global_settings:e, data:index);
+      print(player, format(
+        '#F5ABB8 Removed ' + index + ': ',
+        '#5BCFFA ' + data:index:1));
+      return()
+    )
+  );
+  print(player, format('#F5ABB8 Index not found'));
 );
 
-points(sizex, sizey, eyes, duration, limit, radius, e) ->
+points(e, duration, limit, radius) ->
 (
-    if(sizex != 'auto', sizex = number(sizex));
-    if(sizey != 'auto', sizey = number(sizey));
-    if((sizex != 'auto' && type(sizex) != 'number') ||
-    (sizey != 'auto' && type(sizey) != 'number'), print(player(), 'Invalid size!'); return());
-    addSetting(e, [player()~'name', 'points', duration, limit, radius, [sizex, sizey, eyes]]);
-    print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA points ',
-    '#F5ABB8 for ', '#5BCFFA ' + e, '#F5ABB8  in radius ', '#5BCFFA ' + radius,
-    '#F5ABB8  with max count ', '#5BCFFA ' + limit,
-    '#F5ABB8  and size ', '#5BCFFA ' + size + ' (' + eyes + ')'))
+  addSetting(e, [player()~'name', 'points', duration, limit, radius, [null, 'auto', 'auto']]);
+  print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA points ',
+  '#F5ABB8 for ', '#5BCFFA ' + e, '#F5ABB8  in radius ', '#5BCFFA ' + radius,
+  '#F5ABB8  with max count ', '#5BCFFA ' + limit,
+  '#F5ABB8  and size ', '#5BCFFA ' + size + ' (' + eyes + ')'))
 );
 
-lines(type, duration, limit, radius, e) ->
+boxes(e, duration, limit, radius, type, sizex, sizey) ->
 (
-    addSetting(e, [player()~'name', type + '_lines', duration, limit, radius]);
-    print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA ' + type + '_lines',
-    '#F5ABB8  for ', '#5BCFFA ' + e, '#F5ABB8  in radius ', '#5BCFFA ' + radius,
-    '#F5ABB8  with max count ', '#5BCFFA ' + limit))
+  addSetting(e, [player()~'name', 'boxes', duration, limit, radius, [type, sizex, sizey]]);
+  print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA boxes ',
+  '#F5ABB8 for ', '#5BCFFA ' + e, '#F5ABB8  in radius ', '#5BCFFA ' + radius,
+  '#F5ABB8  with max count ', '#5BCFFA ' + limit,
+  '#F5ABB8  and size ', '#5BCFFA ' + size + ' (' + eyes + ')'))
+);
+
+ticks(e, duration, limit, radius, type, sizex, sizey) ->
+(
+  addSetting(e, [player()~'name', 'ticks', duration, limit, radius, [type, sizex, sizey]]);
+  print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA ticks ',
+  '#F5ABB8 for ', '#5BCFFA ' + e, '#F5ABB8  in radius ', '#5BCFFA ' + radius,
+  '#F5ABB8  with max count ', '#5BCFFA ' + limit,
+  '#F5ABB8  and size ', '#5BCFFA ' + size + ' (' + eyes + ')'))
+);
+
+deaths(e, duration, limit, radius, type, sizex, sizey) ->
+(
+  addSetting(e, [player()~'name', 'deaths', duration, limit, radius, [type, sizex, sizey]]);
+  print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA deaths ',
+  '#F5ABB8 for ', '#5BCFFA ' + e, '#F5ABB8  in radius ', '#5BCFFA ' + radius,
+  '#F5ABB8  with max count ', '#5BCFFA ' + limit,
+  '#F5ABB8  and size ', '#5BCFFA ' + size + ' (' + eyes + ')'))
+);
+
+lines(e, type, duration, limit, radius) ->
+(
+  if(type == 'auto',
+    if(e == 'ender_pearl' || e == 'snowball' || e == 'egg' || e == 'fireball' || e == 'small_fireball' || e == 'dragon_fireball' || e == 'arrow' || e == 'trident',
+      type = 'straight',
+      type = 'axis'
+    )
+  );
+  addSetting(e, [player()~'name', type + '_lines', duration, limit, radius]);
+  print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA ' + type + '_lines',
+  '#F5ABB8  for ', '#5BCFFA ' + e, '#F5ABB8  in radius ', '#5BCFFA ' + radius,
+  '#F5ABB8  with max count ', '#5BCFFA ' + limit))
 );
 
 labels(type, precision, duration, limit, radius, e) ->
 (
-    if(precision != 'max', 
-        precision = number(precision);
-        if(type(precision) != 'number',
-        print(player(), 'Invalid size!'); return())
-    );
-    addSetting(e, [player()~'name', type + '_label', duration, limit, radius, [precision]]);
-    print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA ' + type + '_label',
-    '#F5ABB8  for ', '#5BCFFA ' + e, '#F5ABB8  in radius ', '#5BCFFA ' + radius,
-    '#F5ABB8  with max count ', '#5BCFFA ' + limit, '#F5ABB8  and precision ', '#5BCFFA ' + precision))
+  if(precision != 'max',
+    precision = number(precision);
+    if(type(precision) != 'number',
+    print(player(), 'Invalid size!'); return())
+  );
+  addSetting(e, [player()~'name', type + '_label', duration, limit, radius, [precision]]);
+  print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA ' + type + '_label',
+  '#F5ABB8  for ', '#5BCFFA ' + e, '#F5ABB8  in radius ', '#5BCFFA ' + radius,
+  '#F5ABB8  with max count ', '#5BCFFA ' + limit, '#F5ABB8  and precision ', '#5BCFFA ' + precision))
 );
 
-explosions(type, duration, limit, radius, e) ->
+explosions(type, duration, limit, radius, sizex, sizey, entities) ->
 (
-    addSetting('explosions', [player()~'name', type, duration, limit, radius, [e]]);
-    if(type == 'points' || type == 'blockRays',
-        print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA explosions: ' + type,
-        '#F5ABB8  in radius ', '#5BCFFA ' + radius,
-        '#F5ABB8  with max count ', '#5BCFFA ' + limit)),
+  addSetting('explosions', [player()~'name', type, duration, limit, radius, [sizex, sizey, entities]]);
+  if(type == 'points' || type == 'blockRays',
+    print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA explosions: ' + type,
+    '#F5ABB8  in radius ', '#5BCFFA ' + radius,
+    '#F5ABB8  with max count ', '#5BCFFA ' + limit)),
 
-        print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA explosions: ' + type,
-        '#F5ABB8  in radius ', '#5BCFFA ' + radius,
-        '#F5ABB8  with max count ', '#5BCFFA ' + limit,
-        '#F5ABB8  for ', '#5BCFFA ' + e)),
-    )
+    print(player(), format('#F5ABB8 Now tracking ', '#5BCFFA explosions: ' + type,
+    '#F5ABB8  in radius ', '#5BCFFA ' + radius,
+    '#F5ABB8  with max count ', '#5BCFFA ' + limit,
+    '#F5ABB8  for ', '#5BCFFA ' + e)),
+  )
 );
 
 drawAxisLines(pl, col, duration, m, p1, p2) ->
 (
-    draw_shape('line', duration, 'color', col, 'player', pl, 'from', p1, 'to', [p1:0, p2:1, p1:2]);
-    if(abs(m:0) >= abs(m:2),
-        draw_shape('line', duration, 'color', col, 'player', pl, 'from', [p1:0, p2:1, p1:2], 'to', [p2:0, p2:1, p1:2]);
-        draw_shape('line', duration, 'color', col, 'player', pl, 'from', [p2:0, p2:1, p1:2], 'to', [p2:0, p2:1, p2:2]),
-        draw_shape('line', duration, 'color', col, 'player', pl, 'from', [p1:0, p2:1, p1:2], 'to', [p1:0, p2:1, p2:2]);
-        draw_shape('line', duration, 'color', col, 'player', pl, 'from', [p1:0, p2:1, p2:2], 'to', [p2:0, p2:1, p2:2])
-    );
+  draw_shape('line', duration, 'color', col, 'player', pl, 'from', p1, 'to', [p1:0, p2:1, p1:2]);
+  if(abs(m:0) >= abs(m:2),
+    draw_shape('line', duration, 'color', col, 'player', pl, 'from', [p1:0, p2:1, p1:2], 'to', [p2:0, p2:1, p1:2]);
+    draw_shape('line', duration, 'color', col, 'player', pl, 'from', [p2:0, p2:1, p1:2], 'to', [p2:0, p2:1, p2:2]),
+    draw_shape('line', duration, 'color', col, 'player', pl, 'from', [p1:0, p2:1, p1:2], 'to', [p1:0, p2:1, p2:2]);
+    draw_shape('line', duration, 'color', col, 'player', pl, 'from', [p1:0, p2:1, p2:2], 'to', [p2:0, p2:1, p2:2])
+  );
 );
 
 drawMotion(pl, col, duration, m, p) ->
 (
-    draw_shape('line', duration, 'color', col, 'player', pl, 'from', p, 'to', p + m)
+  draw_shape('line', duration, 'color', col, 'player', pl, 'from', p, 'to', p + m)
 );
 
 drawStraightLine(pl, col, duration, p1, p2) ->
 (
-    draw_shape('line', duration, 'color', col, 'player', pl, 'from', p1, 'to', p2)
+  draw_shape('line', duration, 'color', col, 'player', pl, 'from', p1, 'to', p2)
 );
 
-drawBox(pl, col, duration, pos, sizex, sizey) ->
+drawPoint(pl, col, duration, pos) ->
 (
-    sizex = sizex / 2;
-    sizey = sizey / 2;
-    draw_shape('box', duration, 'color', col, 'player', pl,
-    'from', pos - [sizex, sizey, sizex],
-    'to', pos + [sizex, sizey, sizex]);
+  draw_shape('box', duration, 'color', col, 'player', pl,
+    'from', pos - [0.00625, 0, 0.00625],
+    'to', pos + [0.00625, 0.0125, 0.00625]);
+);
+
+drawBox(pl, col, col1, duration, pos, sizex, sizey) ->
+(
+  sizex = sizex / 2;
+  draw_shape('box', duration, 'color', col, 'fill', col1, 'player', pl,
+  'from', pos - [sizex, 0, sizex],
+  'to', pos + [sizex, sizey, sizex]);
 );
 
 drawEyeHeight(pl, col, duration, pos, w, e) ->
 (
-    pos = pos + [0, e~'eye_height', 0];
-    w = w/2;
-    drawStraightLine(pl, col, duration, pos + [-w, 0, -w], pos + [-w, 0, w]);
-    drawStraightLine(pl, col, duration, pos + [-w, 0, w], pos + [w, 0, w]);
-    drawStraightLine(pl, col, duration, pos + [w, 0, w], pos + [w, 0, -w]);
-    drawStraightLine(pl, col, duration, pos + [w, 0, -w], pos + [-w, 0, -w]);
+  pos = pos + [0, e~'eye_height', 0];
+  w = w/2;
+  drawStraightLine(pl, col, duration, pos + [-w, 0, -w], pos + [-w, 0, w]);
+  drawStraightLine(pl, col, duration, pos + [-w, 0, w], pos + [w, 0, w]);
+  drawStraightLine(pl, col, duration, pos + [w, 0, w], pos + [w, 0, -w]);
+  drawStraightLine(pl, col, duration, pos + [w, 0, -w], pos + [-w, 0, -w]);
 
-    drawStraightLine(pl, col, duration, pos + [-w, 0, -w], pos + [w, 0, w]);
-    drawStraightLine(pl, col, duration, pos + [w, 0, -w], pos + [-w, 0, w]);
+  drawStraightLine(pl, col, duration, pos + [-w, 0, -w], pos + [w, 0, w]);
+  drawStraightLine(pl, col, duration, pos + [w, 0, -w], pos + [-w, 0, w]);
 );
 
 drawLabel(pl, col, align, duration, p, text) ->
 (
-    if(align == 'bottom',
-        draw_shape('label', duration, 'color', col, 'pos', p, 'text', text));
-    if(align == 'center',
-        draw_shape('label', duration, 'color', col, 'height', -0.5, 'pos', p, 'text', text));
-    if(align == 'top',
-        draw_shape('label', duration, 'color', col, 'height', -1, 'pos', p, 'text', text));
+  if(align == 'bottom',
+    draw_shape('label', duration, 'color', col, 'pos', p, 'text', text));
+  if(align == 'center',
+    draw_shape('label', duration, 'color', col, 'height', -0.5, 'pos', p, 'text', text));
+  if(align == 'top',
+    draw_shape('label', duration, 'color', col, 'height', -1, 'pos', p, 'text', text));
 );
 
 drawRays(player, duration, pos, entity) ->
 (
-    w = entity~'width';
-    h = entity~'height';
-    ep = entity~'pos';
-    dx = 1 / (w * 2 + 1);
-    dy = 1 / (h * 2 + 1);
-    offset = (1 - floor(1 / dx) * dx) / 2;
-    c_for(x = 0, x <= 1, x += dx,
-        c_for(y = 0, y <= 1, y += dy,
-            c_for(z = 0, z <= 1, z += dx,
-                drawStraightLine(player, 0xFF0000FF, duration, pos, [
-                    ep:0 - w / 2 + offset + x * w,
-                    ep:1 + y * h,
-                    ep:2 - w / 2 + offset + z * w])
-            )
-        )
+  w = entity~'width';
+  h = entity~'height';
+  ep = entity~'pos';
+  dx = 1 / (w * 2 + 1);
+  dy = 1 / (h * 2 + 1);
+  offset = (1 - floor(1 / dx) * dx) / 2;
+  c_for(x = 0, x <= 1, x += dx,
+    c_for(y = 0, y <= 1, y += dy,
+      c_for(z = 0, z <= 1, z += dx,
+        drawStraightLine(player, 0xFF0000FF, duration, pos, [
+          ep:0 - w / 2 + offset + x * w,
+          ep:1 + y * h,
+          ep:2 - w / 2 + offset + z * w])
+      )
     )
+  )
 );
 
 drawBlockRays(player, duration, pos, power) ->
 (
-    c_for(x = 0, x <= 15, x += 1,
-        xRel = x / 15 * 2 - 1;
-        c_for(y = 0, y <= 15, y += 1,
-            yRel = y / 15 * 2 - 1;
-            l = sqrt(xRel * xRel + yRel * yRel + 1);
-            px = xRel / l * power * 1.733333;
-            py = yRel / l * power * 1.733333;
-            pz = 1 / l * power * 1.733333;
-            drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [pz, px, py]);
-            drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [-pz, px, py]);
-            drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [px, pz, py]);
-            drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [px, -pz, py]);
-            drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [px, py, pz]);
-            drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [px, py, -pz])
-        )
+  c_for(x = 0, x <= 15, x += 1,
+    xRel = x / 15 * 2 - 1;
+    c_for(y = 0, y <= 15, y += 1,
+      yRel = y / 15 * 2 - 1;
+      l = sqrt(xRel * xRel + yRel * yRel + 1);
+      px = xRel / l * power * 1.733333;
+      py = yRel / l * power * 1.733333;
+      pz = 1 / l * power * 1.733333;
+      drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [pz, px, py]);
+      drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [-pz, px, py]);
+      drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [px, pz, py]);
+      drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [px, -pz, py]);
+      drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [px, py, pz]);
+      drawStraightLine(player, 0xFF0000FF, duration, pos, pos + [px, py, -pz])
     )
+  )
 );
 
 drawAppliedVelocity(player, duration, pos, entity, power, multiplier) ->
 (
-    ep = entity~'pos';
-    h = if(entity~'type' == 'tnt', 0, entity~'eye_height');
-    dis = dist(pos, ep);
-    dir = ep + [0, h, 0] - pos;
-    drawStraightLine(player, 0XFF0000FF, duration, pos, pos + dir * (1 - dis / power / 2) * multiplier);
+  ep = entity~'pos';
+  h = if(entity~'type' == 'tnt', 0, entity~'eye_height');
+  dis = dist(pos, ep);
+  dir = ep + [0, h, 0] - pos;
+  drawStraightLine(player, 0XFF0000FF, duration, pos, pos + dir * (1 - dis / power / 2) * multiplier);
 );
 
 addSetting(e, entry) ->
 (
-    if(global_settings:e != null,
-        global_settings:e = global_settings:e + {entry -> null},
-        global_settings = global_settings + {e -> {entry -> null}}
-    );
+  if(global_settings:e != null,
+    global_settings:e = global_settings:e + {entry -> null},
+    global_settings = global_settings + {e -> {entry -> null}}
+  );
+  createLoadHandlers()
 );
 
 getPlayerSettings(player) ->
 (
-    settings = {};
-    index = 0;
-    for(pairs(global_settings),
-        [e, data] = _;
-        for(keys(data),
-            if(player(_:0) == player, if(settings:e == null,
-                    settings = settings + {e -> {index -> _}},
-                    settings:e = settings:e + {index -> _});
-                index += 1;
-            )
-        )
-    );
-    return(settings);
+  settings = {};
+  index = 0;
+  for(pairs(global_settings),
+    [e, data] = _;
+    for(keys(data),
+      if(player(_:0) == player, if(settings:e == null,
+        settings = settings + {e -> {index -> _}},
+        settings:e = settings:e + {index -> _});
+        index += 1;
+      )
+    )
+  );
+  return(settings);
 );
 
 dist(p1, p2) ->
 (
-    d = p2 - p1;
-    return(sqrt(d:0^2 + d:1^2 + d:2^2));
+  d = p2 - p1;
+  return(sqrt(d:0^2 + d:1^2 + d:2^2));
 );
 
 roundTriple(triple, log) ->
 (
-    return([round(triple:0 * 10^log) / 10^log,
-    round(triple:1 * 10^log) / 10^log,
-    round(triple:2 * 10^log) / 10^log])
+  return([round(triple:0 * 10^log) / 10^log,
+  round(triple:1 * 10^log) / 10^log,
+  round(triple:2 * 10^log) / 10^log])
 )
