@@ -323,7 +323,7 @@ createOnMoveEvents(e, data) ->
 
     if(type == 'boxes',
       if(arguments:0 == 'custom', sizex = arguments:1; sizey = arguments:2, sizex = e~'width'; sizey = e~'height');
-      if(arguments:0 == 'eyes', drawEyeHeight(player, 0x0000FFFF, duration, p, sizex, e));
+      if(arguments:0 == 'eyes', drawEyeHeight(player, 0x0000FFFF, duration, p2, sizex, e));
       drawBox(player, 0xFFFFFFFF, 0x00000000, duration, p2, sizex, sizey);
       continue()
     );
