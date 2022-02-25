@@ -70,19 +70,19 @@ __config() ->
     'explosions <duration> <limit> <radius> <sizeX> <sizeY>' -> _(duration, limit, radius, sizeX, sizeY) -> explosions('boxes', duration, limit, radius, sizeX, sizeY, ''),
 
     'explosions rays_entities' -> _() -> explosions('rays_entities', 100, 100, 100, 'auto', 'auto', '@e'),
-    'explosions rays_entities <duration>' -> _(duration) -> explosions('rays_entities', duration, 100, 100, '@e'),
+    'explosions rays_entities <duration>' -> _(duration) -> explosions('rays_entities', duration, 100, 100, 'auto', 'auto', '@e'),
     'explosions rays_entities <duration> <limit>' -> _(duration, limit) -> explosions('rays_entities', duration, limit, 100, 'auto', 'auto', '@e'),
     'explosions rays_entities <duration> <limit> <radius>' -> _(duration, limit, radius) -> explosions('rays_entities', duration, limit, radius, 'auto', 'auto', '@e'),
     'explosions rays_entities <duration> <limit> <radius> <entities>' -> _(duration, limit, radius, entities) -> explosions('rays_entities', duration, limit, radius, 'auto', 'auto', entities),
 
     'explosions rays_blocks' -> _() -> explosions('rays_blocks', 100, 100, 100, 'auto', 'auto', ''),
-    'explosions rays_blocks <duration>' -> _(duration) -> explosions('rays_blocks', duration, 100, 100, ''),
+    'explosions rays_blocks <duration>' -> _(duration) -> explosions('rays_blocks', duration, 100, 100, 'auto', 'auto', ''),
     'explosions rays_blocks <duration> <limit>' -> _(duration, limit) -> explosions('rays_blocks', duration, limit, 100, 'auto', 'auto', ''),
     'explosions rays_blocks <duration> <limit> <radius>' -> _(duration, limit, radius) -> explosions('rays_blocks', duration, limit, radius, 'auto', 'auto', ''),
     'explosions rays_blocks <duration> <limit> <radius> <entities>' -> _(duration, limit, radius, entities) -> explosions('rays_blocks', duration, limit, radius, 'auto', 'auto', ''),
 
     'explosions affected_entities' -> _() -> explosions('affected_entities', 100, 100, 100, 'auto', 'auto', '@e'),
-    'explosions affected_entities <duration>' -> _(duration) -> explosions('affected_entities', duration, 100, 100, '@e'),
+    'explosions affected_entities <duration>' -> _(duration) -> explosions('affected_entities', duration, 100, 100, 'auto', 'auto', '@e'),
     'explosions affected_entities <duration> <limit>' -> _(duration, limit) -> explosions('affected_entities', duration, limit, 100, 'auto', 'auto', '@e'),
     'explosions affected_entities <duration> <limit> <radius>' -> _(duration, limit, radius) -> explosions('affected_entities', duration, limit, radius, 'auto', 'auto', '@e'),
     'explosions affected_entities <duration> <limit> <radius> <entities>' -> _(duration, limit, radius, entities) -> explosions('affected_entities', duration, limit, radius, 'auto', 'auto', entities)
