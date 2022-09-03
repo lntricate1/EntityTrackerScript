@@ -90,7 +90,7 @@ __config() ->
   'arguments' ->
   {
     'index' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> []},
-    'label_type' -> {'type' -> 'string', 'options' -> ['position', 'motion', 'lifetime']},
+    'label_type' -> {'type' -> 'string', 'options' -> ['position', 'motion', 'lifetime', 'position_bitstring']},
     'explosion_type' -> {'type' -> 'string', 'options' -> ['rays', 'applied_velocity']},
     'duration' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> [100, 200, 500]},
     'limit' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> [100, 99999]},
@@ -133,6 +133,21 @@ updateUsedEntities(player, e, type) ->
       global_usedEntitiesForTick:player:(e~'uuid') = global_usedEntitiesForTick:player:(e~'uuid') + {type -> 0}
     )
   );
+);
+
+bitstring(n) ->
+(
+  n = double_to_long_bits(n);
+  ret='';
+  c_for(i = 63, i >= 0, i += -1,
+    p = 2^i;
+    if(n >= p,
+      ret += 1;
+      n = bitwise_xor(n, p),
+      ret += 0
+    )
+  );
+  ret
 );
 
 __on_tick() ->
@@ -284,11 +299,16 @@ createOnTickEvents(e, data) ->
 
     if(type == 'motion_lines' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawMotion(player, 0xFF0000FF, duration, m, p); updateUsedEntities(player, e, type); continue());
 
-    if(type == 'position_label', drawLabel(player, 0x0000FFFF, 'top', duration,
-        p, if(arguments:0 != 'max', roundTriple(p, arguments:0), p)); continue());
+    if(type == 'position_label', drawLabel(player, 0x0000FFFF, 'bottom', duration,
+        p + [0, e~'height', 0], if(arguments:0 != 'max', roundTriple(p, arguments:0), p)); continue());
 
-    if(type == 'motion_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0xFF0000FF, 'bottom', duration,
-        p + [0, e~'height', 0], if(arguments:0 != 'max', roundTriple(m, arguments:0), m)); updateUsedEntities(player, e, type); continue());
+    if(type == 'position_bitstring_label',
+      draw_shape('label', duration, 'text', bitstring(p:0), 'height', 3, 'pos', p+[0,e~'height',0], 'player', player, 'color', 0x0000FFFF);
+      draw_shape('label', duration, 'text', bitstring(p:1), 'height', 2, 'pos', p+[0,e~'height',0], 'player', player, 'color', 0x0000FFFF);
+      draw_shape('label', duration, 'text', bitstring(p:2), 'height', 1, 'pos', p+[0,e~'height',0], 'player', player, 'color', 0x0000FFFF); continue());
+
+    if(type == 'motion_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0xFF0000FF, 'top', duration,
+        p, if(arguments:0 != 'max', roundTriple(m, arguments:0), m)); updateUsedEntities(player, e, type); continue());
 
     if(type == 'lifetime_label' && global_usedEntitiesForTick:player:(e~'uuid'):type == null, drawLabel(player, 0x00FF00FF, 'center', duration,
         p + [0, e~'height' / 2, 0], e~'age'); updateUsedEntities(player, e, type); continue());
@@ -614,11 +634,11 @@ drawEyeHeight(pl, col, duration, pos, w, e) ->
 drawLabel(pl, col, align, duration, p, text) ->
 (
   if(align == 'bottom',
-    draw_shape('label', duration, 'color', col, 'pos', p, 'text', text));
+    draw_shape('label', duration, 'color', col, 'height', 1, 'pos', p, 'text', text));
   if(align == 'center',
     draw_shape('label', duration, 'color', col, 'height', -0.5, 'pos', p, 'text', text));
   if(align == 'top',
-    draw_shape('label', duration, 'color', col, 'height', -1, 'pos', p, 'text', text));
+    draw_shape('label', duration, 'color', col, 'height', -2, 'pos', p, 'text', text));
 );
 
 drawRays(player, duration, pos, entity) ->
