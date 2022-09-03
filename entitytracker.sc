@@ -38,8 +38,7 @@ __config() ->
     'deaths <entities>' -> _(entities) -> deaths(entities, 100, 100, 100, 'auto', 'auto', 'auto'),
     'deaths <entities> <duration>' -> _(entities, duration) -> deaths(entities, duration, 100, 100, 'auto', 'auto', 'auto'),
     'deaths <entities> <duration> <limit>' -> _(entities, duration, limit) -> deaths(entities, duration, limit, 100, 'auto', 'auto', 'auto'),
-    'deaths <entities> <duration> <limit> <radius>' -> _(entities, duration, limit, radius) -> deaths(entities, duration, limit, radius, 'auto', 'auto', 'auto'),
-    'deaths <entities> <duration> <limit> <radius> <sizeX> <sizeY>' -> _(entities, duration, limit, radius, sizeX, sizeY) -> deaths(entities, duration, limit, radius, 'custom', sizeX, sizeY),
+    'deaths <entities> <duration> <limit> <radius>' -> _(entities, duration, limit, radius) -> deaths(entities, duration, limit, radius, 'auto', 'auto', 'auto'), 'deaths <entities> <duration> <limit> <radius> <sizeX> <sizeY>' -> _(entities, duration, limit, radius, sizeX, sizeY) -> deaths(entities, duration, limit, radius, 'custom', sizeX, sizeY),
 
     'lines <entities>' -> _(entities) -> lines(entities, 'auto', 100, 100, 100),
     'lines <entities> <duration>' -> _(entities, duration) -> lines(entities, 'auto', duration, 100, 100),
@@ -56,11 +55,13 @@ __config() ->
     'lines <entities> motion <duration> <limit>' -> _(entities, duration, limit) -> lines(entities, 'motion', duration, limit, 100),
     'lines <entities> motion <duration> <limit> <radius>' -> _(entities, duration, limit, radius) -> lines(entities, 'motion', duration, limit, radius),
 
-    'labels <label_type> <precision> <duration> <limit> <radius> <entities>' -> 'labels',
+    'labels <entities> <label_type> <precision> <duration> <limit> <radius>' -> 'labels',
 
-    'labels lifetime <duration> <limit> <radius> <entities>' -> _(duration, limit, radius, entities) -> labels('lifetime', null, duration, limit, radius, entities),
+    'labels <entities> position_bitstring <duration> <limit> <radius>' -> _(entities, duration, limit, radius) -> labels(entities, 'position_bitstring', null, duration, limit, radius),
 
-    'labels fuse <duration> <limit> <radius>' -> _(duration, limit, radius) -> labels('fuse', null, duration, limit, radius, 'tnt'),
+    'labels <entities> lifetime <duration> <limit> <radius>' -> _(entities, duration, limit, radius) -> labels(entities, 'lifetime', null, duration, limit, radius),
+
+    'labels fuse <duration> <limit> <radius>' -> _(duration, limit, radius) -> labels('tnt', 'fuse', null, duration, limit, radius),
 
     'explosions' -> _() -> explosions('points', 100, 100, 100, 'auto', 'auto', ''),
     'explosions <duration>' -> _(duration) -> explosions('points', duration, 100, 100, 'auto', 'auto', ''),
@@ -90,7 +91,7 @@ __config() ->
   'arguments' ->
   {
     'index' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> []},
-    'label_type' -> {'type' -> 'string', 'options' -> ['position', 'motion', 'lifetime', 'position_bitstring']},
+    'label_type' -> {'type' -> 'string', 'options' -> ['position', 'motion', 'lifetime']},
     'explosion_type' -> {'type' -> 'string', 'options' -> ['rays', 'applied_velocity']},
     'duration' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> [100, 200, 500]},
     'limit' -> {'type' -> 'int', 'min' -> 0, 'suggest' -> [100, 99999]},
@@ -137,9 +138,21 @@ updateUsedEntities(player, e, type) ->
 
 bitstring(n) ->
 (
+  if(n < 0,
+    n = -n; ret = '1_',
+    ret = '0_'
+  );
   n = double_to_long_bits(n);
-  ret='';
-  c_for(i = 63, i >= 0, i += -1,
+  c_for(i = 62, i > 51, i += -1,
+    p = 2^i;
+    if(n >= p,
+      ret += 1;
+      n = bitwise_xor(n, p),
+      ret += 0
+    )
+  );
+  ret += '_';
+  c_for(i = 51, i >= 0, i += -1,
     p = 2^i;
     if(n >= p,
       ret += 1;
@@ -371,21 +384,21 @@ help(player) ->
     print(player, format('w Shows all active trackers.'));
     print('');
 
-    print(player, format('#5BCFFA /entitytracker lines <mode> <duration> <entity limit> <radius> <entity selector>'));
+    print(player, format('#5BCFFA /entitytracker lines <entities> <mode> <duration> <entity limit> <radius>'));
     print(player, format('w Draws lines following entity movement.
     ', '#F5ABB8 \'straight\'', 'w  mode draws straight lines.
     ', '#F5ABB8 \'accurate\'', 'w  mode draws the real collision checks (not used in projectiles).
     And ', '#F5ABB8 \'motion\'', 'w  draws the motion vector.'));
     print('');
 
-    print(player, format('#5BCFFA /entitytracker labels <mode> <precision> <duration> <entity limit> <radius> <entity selector>'));
+    print(player, format('#5BCFFA /entitytracker labels <entities> <mode> <precision> <duration> <entity limit> <radius>'));
     print(player, format('w Draws labels following entity movement.
     ', '#F5ABB8 \'positions\'', 'w  mode says the position vector.
     ', '#F5ABB8 \'motion\'', 'w  mode says the velocity vector.
     And ', '#F5ABB8 \'lifetime\'', 'w  mode says the age of the entity.'));
     print('');
 
-    print(player, format('#5BCFFA /entitytracker points <sizex> <sizey> <eyes?> <duration> <entity limit> <radius> <entity selector>'));
+    print(player, format('#5BCFFA /entitytracker boxes <entities> <sizex> <sizey> <eyes?> <duration> <entity limit> <radius>'));
     print(player, format('w Draws a box at each position the entity exists, with size <sizex> * <sizey>. The box\'s feet will be centered at the entity\'s feet.'));
     print('');
 
@@ -464,13 +477,15 @@ list(player) ->
         '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius
         , 'w , precision: ', '#5BCFFA ' + arguments:0)));
 
+        if(type == 'position_bitstring_label', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA position bitstring label', 'w , duration: ',
+        '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius)));
+
         if(type == 'motion_label', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA motion label', 'w , duration: ',
         '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius
         , 'w , precision: ', '#5BCFFA ' + arguments:0)));
 
         if(type == 'lifetime_label', print(player, format('#F5ABB8 ' + index + ': ', '#5BCFFA lifetime label', 'w , duration: ',
-        '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radiuss
-        , 'w , precision: ', '#5BCFFA ' + arguments:0)))
+        '#5BCFFA ' + duration, 'w , limit: ', '#5BCFFA ' + limit, 'w , radius: ', '#5BCFFA ' + radius)))
 
         ,
 
@@ -554,7 +569,7 @@ lines(e, type, duration, limit, radius) ->
   '#F5ABB8  with max count ', '#5BCFFA ' + limit))
 );
 
-labels(type, precision, duration, limit, radius, e) ->
+labels(e, type, precision, duration, limit, radius) ->
 (
   if(precision != 'max',
     precision = number(precision);
